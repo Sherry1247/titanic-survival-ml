@@ -2,5 +2,3 @@
 .DS_Store
 venv/
 
-# Image files (if you don't want them tracked)
-data/*.png
