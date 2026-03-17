@@ -2,3 +2,7 @@
 .DS_Store
 venv/
 
+# Ignore large datasets to prevent GitHub LFS errors
+*Road Accident Data.csv
+*Covid Data.csv
+*AgeDataset-V1.csv
