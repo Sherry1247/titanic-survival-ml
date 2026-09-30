@@ -1,0 +1,20 @@
+project: titanic-survival-game
+purpose: Educational classification game and exploratory analysis
+sources:
+  - id: kaggle-titanic
+    path: data/Kaggle_titanic_dataset/Titanic-Dataset.csv
+    role: Primary labeled passenger dataset
+    fields: PassengerId, Survived, Pclass, Name, Sex, Age, SibSp, Parch, Ticket, Fare, Cabin, Embarked
+    caveat: Historical sample; missing cabin and age values require explicit handling.
+  - id: titanic-game-reference
+    url: https://www.kaggle.com/competitions/titanic/data
+    role: Dataset schema and competition reference
+    caveat: Use the local checked-in copy for reproducible runs; document any replacement file hash.
+  - id: encyclopedia-britannica-titanic
+    url: https://www.britannica.com/event/Titanic
+    role: Historical context only, not a model feature source
+    caveat: Contextual narrative must not be mixed into predictive training data.
+  - id: encyclopedia-titanica
+    url: https://www.encyclopedia-titanica.org/
+    role: Passenger-level historical context and names research
+    caveat: Use as contextual research; do not join unverified narrative fields into model training.
