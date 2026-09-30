@@ -1,0 +1,11 @@
+{
+  "name": "the-last-crossing",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build-bundle.mjs",
+    "model:export": "python scripts/export_model_report.py",
+    "check:bundle": "node build-bundle.mjs --check",
+    "test": "npm run check:bundle && node --test"
+  }
+}
