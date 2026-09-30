@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#071827" />
+    <meta name="description" content="A cinematic, interactive Titanic survival game about choices under pressure." />
+    <title>The Last Crossing — Titanic Survival Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="grain"></div>
+    <div class="intro" id="intro" aria-labelledby="intro-title">
+      <div class="intro__stars"></div>
+      <div class="intro__content">
+        <p class="eyebrow" data-i18n="introEyebrow">RMS TITANIC · 14 APRIL 1912</p>
+        <h1 id="intro-title"><span data-i18n="introTitleTop">The Last</span><em data-i18n="introTitleBottom">Crossing</em></h1>
+        <p class="intro__copy" data-i18n="introCopy">A story of incomplete information, impossible choices, and the people behind the numbers.</p>
+        <div class="intro__timeline" aria-hidden="true">
+          <span>23:40</span><i></i><span>00:00</span><i></i><span>02:20</span>
+        </div>
+        <button class="button button--gold intro__button" id="enter-game" data-i18n="enterGame">Enter the ship</button>
+        <button class="text-button" id="skip-intro" data-i18n="skipIntro">Skip introduction</button>
+      </div>
+    </div>
+
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="The Last Crossing home"><span class="brand__mark">✦</span><span>THE LAST CROSSING</span></a>
+      <nav class="topbar__nav" aria-label="Main navigation">
+        <a href="#how-to-play" data-i18n="howToPlay">How to play</a>
+        <a href="#history" data-i18n="history">History</a>
+        <a href="#leaderboard" data-i18n="leaderboard">Leaderboard</a>
+      </nav>
+      <button class="language" id="language-toggle" aria-label="Change language">中文</button>
+    </header>
+
+    <main id="top">
+      <section class="hero shell">
+        <div class="hero__copy">
+          <p class="eyebrow" data-i18n="heroEyebrow">A playable history experiment</p>
+          <h2><span data-i18n="heroTitleTop">Everyone had a plan.</span><br /><em data-i18n="heroTitleBottom">Then the sea changed everything.</em></h2>
+          <p class="hero__lede" data-i18n="heroLede">Step aboard a living ship. Read the room, move through the decks, and make the call before the last boat leaves.</p>
+          <div class="hero__actions"><button class="button button--gold" data-scroll-game data-i18n="playNow">Play now</button><a class="button button--quiet" href="#how-to-play" data-i18n="learnRules">Learn the rules</a></div>
+          <div class="hero__facts"><span><b>2</b><small data-i18n="gameModes">game modes</small></span><span><b>60s</b><small data-i18n="decisionWindow">decision window</small></span><span><b>1912</b><small data-i18n="historicalLens">historical lens</small></span></div>
+        </div>
+        <div class="hero__ship" aria-label="Illustration of Titanic at sea">
+          <div class="moon"></div><div class="smoke smoke--one"></div><div class="smoke smoke--two"></div><div class="smoke smoke--three"></div>
+          <div class="ship-illustration"><div class="ship-illustration__deck"></div><div class="ship-illustration__hull"></div><div class="ship-illustration__stripe"></div><div class="ship-illustration__lights"></div><div class="ship-illustration__bow"></div></div>
+          <div class="ocean ocean--one"></div><div class="ocean ocean--two"></div><div class="ocean ocean--three"></div>
+          <span class="hero__caption" data-i18n="heroCaption">North Atlantic · 41° 44′ N, 49° 57′ W</span>
+        </div>
+      </section>
+
+      <section class="how shell" id="how-to-play">
+        <div class="section-heading"><p class="eyebrow" data-i18n="howEyebrow">Before you board</p><h2 data-i18n="howTitle">Three gestures. One human decision.</h2><p data-i18n="howCopy">The game teaches you before it tests you. No hidden rules, no red-versus-yellow puzzle boxes.</p></div>
+        <div class="steps"><article class="step"><span>01</span><div class="step__icon">◉</div><h3 data-i18n="stepOneTitle">Choose your role</h3><p data-i18n="stepOneCopy">Command a lifeboat or become one passenger trying to find the deck.</p></article><article class="step"><span>02</span><div class="step__icon">↗</div><h3 data-i18n="stepTwoTitle">Drag through the ship</h3><p data-i18n="stepTwoCopy">Move cards and people. The deck is your map; the timer is the pressure.</p></article><article class="step"><span>03</span><div class="step__icon">✦</div><h3 data-i18n="stepThreeTitle">Read your result</h3><p data-i18n="stepThreeCopy">See how your choice compares with the historical data and the model.</p></article></div>
+      </section>
+
+      <section class="game-shell shell" id="game">
+        <div class="game-header"><div><p class="eyebrow" data-i18n="gameEyebrow">The playable deck</p><h2 data-i18n="gameTitle">Your watch begins now.</h2></div><div class="game-status"><span class="status-dot"></span><span data-i18n="statusLive">LIVE SIMULATION</span></div></div>
+        <div class="mode-switch" role="tablist" aria-label="Game mode"><button class="mode-button is-active" role="tab" aria-selected="true" data-mode="captain" data-i18n="captainMode">Lifeboat commander</button><button class="mode-button" role="tab" aria-selected="false" data-mode="passenger" data-i18n="passengerMode">Play as a passenger</button></div>
+        <div class="game-grid">
+          <aside class="manifest panel"><div class="panel__heading"><span class="eyebrow" data-i18n="manifestEyebrow">Passenger manifest</span><span class="counter" id="capacity">0 / 4</span></div><h3 id="mode-title">Choose who boards first.</h3><p id="mode-copy">Drag a passenger card to the lifeboat. Think fast: four seats, incomplete information.</p><div class="passenger-list" id="passenger-list"></div><button class="button button--gold button--full" id="start-game" data-i18n="startGame">Start this watch</button><button class="button button--quiet button--full" id="reset-game" data-i18n="resetGame">Reset</button><div class="game-message" id="game-message" role="status" aria-live="polite">Read the manifest, then start when you are ready.</div></aside>
+          <section class="ship-board panel" aria-label="Interactive ship deck"><div class="ship-board__top"><span class="ship-label">RMS TITANIC</span><span id="timer">READY</span><span class="score-label"><span data-i18n="score">SCORE</span> <b id="score">0</b></span></div><div class="ship-map" id="ship-map"><div class="map-grid"></div><div class="zone zone--third"><b data-i18n="thirdClass">Third class</b><small>F-deck</small></div><div class="zone zone--stairs"><b data-i18n="grandStaircase">Grand staircase</b><small>midship</small></div><div class="zone zone--boat"><b data-i18n="boatDeck">Boat deck</b><small>upper deck</small></div><div class="zone zone--boiler"><b data-i18n="boilerRoom">Boiler room</b><small>lower deck</small></div><div class="route route--one"></div><div class="route route--two"></div><div class="route route--three"></div><div class="route-label" data-i18n="routeLabel">EVACUATION ROUTE</div><div class="lifeboat-drop" id="lifeboat" aria-label="Green lifeboat drop target"><div class="lifeboat-drop__top"><b data-i18n="lifeboat">Lifeboat 7</b><span>CAPACITY 4</span></div><div class="seats" id="seats"><i>01</i><i>02</i><i>03</i><i>04</i></div></div><div class="route-target target--stairs" data-target="stairs"><b data-i18n="toStairs">Drag to the stairs</b><small>NEXT</small></div><div class="route-target target--deck" data-target="deck"><b data-i18n="toDeck">Drag to the boat deck</b><small>NEXT</small></div><div class="route-target target--boat" data-target="boat"><b data-i18n="toBoat">Drag into the lifeboat</b><small>FINISH</small></div><div class="player-token" id="player-token" draggable="true">✦</div></div><div class="board-legend"><span><i class="legend-dot legend-dot--navy"></i><span data-i18n="legendShip">ship interior</span></span><span><i class="legend-dot legend-dot--gold"></i><span data-i18n="legendNext">next move</span></span><span><i class="legend-dot legend-dot--green"></i><span data-i18n="legendSafe">safe zone</span></span></div></section>
+        </div>
+        <div class="leaderboard-bar" id="leaderboard"><div><span class="eyebrow" data-i18n="leaderboardEyebrow">Personal bests</span><strong data-i18n="leaderboardTitle">Your logbook</strong></div><ol id="leaderboard-list"><li data-i18n="noScores">No voyages logged yet.</li></ol></div>
+      </section>
+
+      <section class="history shell" id="history"><div class="history__copy"><p class="eyebrow" data-i18n="historyEyebrow">History behind the game</p><h2 data-i18n="historyTitle">The ship was not a spreadsheet.</h2><p data-i18n="historyCopy">The public dataset can tell us patterns: age, class, sex, and family size. It cannot tell us the sound of the corridor, the order of a launch, or what a person feared. This game keeps those limits visible.</p><a href="https://www.titanicmuseum.org/titanic-history/" target="_blank" rel="noreferrer" class="text-link" data-i18n="historyLink">Read the historical context →</a></div><div class="history-card"><span class="quote-mark">“</span><p data-i18n="historyQuote">Every score is an interpretation, not a verdict.</p><span class="quote-source">THE DATA ROOM · TITANIC SURVIVAL GAME</span></div></section>
+    </main>
+    <footer class="footer shell"><span>THE LAST CROSSING</span><span data-i18n="footer">A personal research game about data, history, and decisions under pressure.</span><a href="#top" data-i18n="backTop">Back to top ↑</a></footer>
+    <script src="./game.js"></script>
+  </body>
+</html>
