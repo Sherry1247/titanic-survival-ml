@@ -22,3 +22,15 @@ def test_titanic_data_schema():
     df = load_titanic()
     assert len(df) > 800
     assert {"Survived", "Pclass", "Sex", "Age"}.issubset(df.columns)
+
+
+def test_cross_validated_model_report_has_calibration_and_baseline():
+    pytest.importorskip("sklearn")
+    from titanic_game.data import load_titanic
+    from titanic_game.model import evaluate_models
+
+    reports, probabilities = evaluate_models(load_titanic(), folds=3)
+    assert {"Logistic regression", "Random forest", "Majority baseline"}.issubset(reports)
+    assert len(probabilities["Logistic regression"]) == 891
+    assert len(reports["Logistic regression"]["calibration"]) >= 4
+    assert 0 <= reports["Logistic regression"]["metrics"]["brier"]["mean"] <= 1
