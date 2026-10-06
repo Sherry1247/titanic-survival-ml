@@ -2,180 +2,140 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#06131e" />
-    <meta name="description" content="A story-led Titanic evacuation game with historical records and a personal survival model." />
-    <title>The Last Crossing — Titanic Survival Story</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#071722" />
+    <meta name="description" content="An interactive historical survival experience, passenger-data story, and Titanic model-literacy project." />
+    <title>The Last Crossing — Titanic, Decisions, and Data</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css" />
-    <link rel="stylesheet" href="./game.css" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <link rel="stylesheet" href="./styles.css?v=2026100504" />
   </head>
   <body>
-    <div class="grain"></div>
+    <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="intro story-intro" id="intro" aria-labelledby="intro-title">
-      <div class="story-progress" id="story-progress" aria-label="Story progress"></div>
+    <div class="story-intro" id="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+      <div class="story-progress" id="story-progress" aria-label="Opening story progress"></div>
       <article class="story-slide is-active" data-story-slide="0">
-        <img src="./assets/history/titanic-southampton.jpg" alt="RMS Titanic at Southampton in April 1912" />
+        <img src="./assets/history/titanic-southampton.jpg" width="1600" height="1050" alt="RMS Titanic at Southampton in April 1912" />
         <div class="story-slide__shade"></div>
         <div class="story-slide__copy">
-          <p class="eyebrow">SOUTHAMPTON · 10 APRIL 1912</p>
-          <h1 id="intro-title"><span data-i18n="storyOneTitle">A ship built for a new age.</span></h1>
-          <p data-i18n="storyOneCopy">Titanic leaves Southampton on her maiden voyage. More than two thousand passengers and crew carry different tickets, families, duties, and expectations.</p>
-          <small data-i18n="storyPhotoCredit">Historical photograph · public domain · Wikimedia Commons</small>
+          <p class="historical-time">SOUTHAMPTON · 10 APRIL 1912</p>
+          <h1 id="intro-title" data-en="A ship built for a new age." data-zh="一艘为新时代建造的船。">A ship built for a new age.</h1>
+          <p data-en="More than two thousand passengers and crew carry different tickets, families, duties, and expectations." data-zh="两千多名乘客和船员带着不同的船票、家庭、职责与期待启航。">More than two thousand passengers and crew carry different tickets, families, duties, and expectations.</p>
+          <small>Historical photograph · public domain · Wikimedia Commons</small>
         </div>
       </article>
-
       <article class="story-slide" data-story-slide="1">
-        <div class="plan-stage">
-          <img src="./assets/history/boat-deck-plan.svg" alt="Plan of Titanic's boat deck and lifeboat positions" />
-          <div class="plan-stage__route"><i></i><i></i><i></i><i></i></div>
-        </div>
+        <div class="plan-stage"><img src="./assets/history/boat-deck-plan.svg" width="1200" height="620" alt="Plan of Titanic's boat deck and lifeboat positions" /></div>
         <div class="story-slide__copy story-slide__copy--left">
-          <p class="eyebrow">A SHIP OF MANY LEVELS</p>
-          <h2 data-i18n="storyTwoTitle">The route to safety was not one corridor.</h2>
-          <p data-i18n="storyTwoCopy">Cabins, staircases, gates, working spaces, and open decks formed a vertical city. Where a person started shaped the route they had to find.</p>
-          <small data-i18n="storyPlanCredit">Boat deck plan · CC0 · Wikimedia Commons</small>
+          <p class="historical-time">A SHIP OF MANY LEVELS</p>
+          <h2 data-en="The route to safety was not one corridor." data-zh="通往安全的路线并不是一条走廊。">The route to safety was not one corridor.</h2>
+          <p data-en="Class, starting area, companions, instructions, and time shaped what a passenger could know and do." data-zh="舱位、起始区域、同行者、指示与时间，共同影响乘客能够知道什么、做什么。">Class, starting area, companions, instructions, and time shaped what a passenger could know and do.</p>
         </div>
       </article>
-
       <article class="story-slide" data-story-slide="2">
-        <div class="cabin-stage" aria-label="Stylized third-class cabin with seated passengers">
-          <div class="cabin-stage__ceiling"><i></i><i></i><i></i></div>
-          <div class="cabin-stage__window"><span></span></div>
-          <div class="cabin-stage__aisle"></div>
-          <div class="cabin-seat seat-a"><span class="mini-person person-blue"><i></i><b></b></span></div>
-          <div class="cabin-seat seat-b"><span class="mini-person person-red"><i></i><b></b></span></div>
-          <div class="cabin-seat seat-c"><span class="mini-person person-gold"><i></i><b></b></span></div>
-          <div class="cabin-seat seat-d"><span class="mini-person person-green"><i></i><b></b></span></div>
-          <div class="cabin-seat seat-e"><span class="mini-person person-red"><i></i><b></b></span></div>
-          <div class="cabin-seat seat-f"><span class="mini-person person-blue"><i></i><b></b></span></div>
+        <div class="cross-section-stage" role="img" aria-label="Simplified orientation diagram of Titanic deck levels; not a map of recorded passenger locations">
+          <svg viewBox="0 0 1200 620" aria-hidden="true" focusable="false">
+            <path class="diagram-hull" d="M70 150h1030l-72 322H224L70 150Z" />
+            <path class="diagram-superstructure" d="M238 98h652l76 52H180l58-52Z" />
+            <g class="diagram-decks"><path d="M128 214h920"/><path d="M156 278h878"/><path d="M182 342h838"/><path d="M207 406h798"/></g>
+            <g class="diagram-stairs"><path d="m365 406 64-64 64 64 64-64 64 64"/><path d="m690 342 54-64 54 64 54-64"/></g>
+            <g class="diagram-labels"><text x="1045" y="205">BOAT</text><text x="1032" y="270">A–B</text><text x="1016" y="334">C–D</text><text x="1000" y="398">E–F</text><text x="976" y="462">LOWER</text></g>
+            <g class="diagram-routes"><circle cx="302" cy="438" r="10"/><path d="M302 438 404 366 540 302 724 238 872 181"/><circle cx="872" cy="181" r="10"/></g>
+          </svg>
+          <p>ORIENTATION DIAGRAM · NOT A RECORDED CABIN MAP</p>
         </div>
         <div class="story-slide__copy story-slide__copy--right">
-          <p class="eyebrow">14 APRIL · 23:35</p>
-          <h2 data-i18n="storyThreeTitle">Most people are still inside.</h2>
-          <p data-i18n="storyThreeCopy">Dinner has ended. Cabins are quiet. The people you will meet are real records from the Kaggle passenger manifest; their historical outcomes remain hidden until your decision is complete.</p>
+          <p class="historical-time">14 APRIL · 11:35 PM</p>
+          <h2 data-en="You begin below the open deck." data-zh="你的故事从露天甲板之下开始。">You begin below the open deck.</h2>
+          <p data-en="Routes upward were not equivalent. Class, companions, congestion, and incomplete instructions changed what could happen next." data-zh="向上的路线并不等同。舱位、同行者、拥堵与不完整的指示，会改变接下来可能发生的事。">Routes upward were not equivalent. Class, companions, congestion, and incomplete instructions changed what could happen next.</p>
         </div>
       </article>
-
       <article class="story-slide story-slide--impact" data-story-slide="3">
-        <img src="./assets/history/iceberg.png" alt="Iceberg photographed near Titanic's wreck site in April 1912" />
-        <div class="impact-flash"></div>
-        <div class="impact-ship"><span></span><i></i></div>
+        <img src="./assets/history/iceberg.png" width="1400" height="900" alt="Iceberg photographed near Titanic's wreck site in April 1912" />
+        <div class="impact-line" aria-hidden="true"></div>
         <div class="story-slide__copy story-slide__copy--impact">
-          <p class="eyebrow">23:40 · IMPACT</p>
-          <h2 data-i18n="storyFourTitle">The hull shudders. The story becomes a decision.</h2>
-          <p data-i18n="storyFourCopy">You have limited time, incomplete information, and no perfect answer. Find the boat deck—or decide who receives a seat.</p>
-          <button class="button button--gold intro__button" id="enter-game" data-i18n="beginEvacuation">Begin evacuation</button>
+          <p class="historical-time">11:40 PM · IMPACT</p>
+          <h2 data-en="The record becomes a situation." data-zh="记录成为处境。">The record becomes a situation.</h2>
+          <p data-en="Open a passenger record, move through five changing situations, then compare the simulation with history and data." data-zh="打开一份乘客记录，经历五个不断变化的局势，再将模拟与历史及数据进行比较。">Open a passenger record, move through five changing situations, then compare the simulation with history and data.</p>
+          <div class="intro-actions"><button class="action-primary" id="enter-story" type="button" data-en="Begin the story" data-zh="开始故事">Begin the story</button><button class="text-action text-action--light" id="intro-explore" type="button" data-en="Explore passenger data" data-zh="探索乘客数据">Explore passenger data</button></div>
         </div>
       </article>
-
-      <div class="story-controls">
-        <button class="story-control" id="story-prev" type="button" aria-label="Previous story scene">←</button>
-        <button class="story-control story-control--next" id="story-next" type="button"><span data-i18n="continueStory">Continue</span> →</button>
-        <button class="text-button" id="skip-intro" data-i18n="skipStory">Skip story</button>
-      </div>
+      <div class="story-controls"><button id="story-prev" type="button" aria-label="Previous opening scene" data-en="Back" data-zh="返回">Back</button><button id="story-next" type="button" data-en="Next" data-zh="继续">Next</button><button id="skip-intro" type="button" aria-label="Skip opening" data-en="Skip" data-zh="跳过">Skip</button></div>
     </div>
 
-    <header class="topbar">
-      <a class="brand" href="#top" aria-label="The Last Crossing home"><span class="brand__mark">✦</span><span>THE LAST CROSSING</span></a>
-      <nav class="topbar__nav" aria-label="Main navigation">
-        <a href="#story" data-i18n="navStory">Story</a>
-        <a href="#ship-design" data-i18n="navShip">Ship & route</a>
-        <a href="#game" data-i18n="navEscape">Evacuation</a>
-        <a href="#model-room" data-i18n="navModel">Model room</a>
-      </nav>
-      <button class="language" id="language-toggle" aria-label="Change language">中文</button>
+    <header class="masthead">
+      <a class="masthead__brand" href="#top">THE LAST CROSSING</a>
+      <div class="masthead__issue"><span>RMS TITANIC · 1912 / 891 RECORDS</span><span>INTERACTIVE RESEARCH EDITION</span></div>
+      <nav aria-label="Primary navigation"><a href="#experience">Experience</a><a href="#evidence">Data story</a><a href="#explore">Explore</a><a href="#model">Model</a><a href="#sources">Sources</a></nav>
+      <button class="language-toggle" id="language-toggle" type="button" aria-label="Change language">中文</button>
     </header>
 
-    <main id="top">
-      <section class="hero hero--historical shell" id="story">
+    <main id="main">
+      <section class="hero" id="top">
         <div class="hero__copy">
-          <p class="eyebrow" data-i18n="heroEyebrow">An interactive historical narrative</p>
-          <h2><span data-i18n="heroTitleTop">First, understand the ship.</span><br /><em data-i18n="heroTitleBottom">Then make the choice.</em></h2>
-          <p class="hero__lede" data-i18n="heroLede">Follow the voyage from Southampton to the collision, read the route through the decks, and meet real passenger records before the model reveals what it learned.</p>
-          <div class="hero__actions"><button class="button button--gold" data-scroll-game data-i18n="playNow">Enter the evacuation</button><a class="button button--quiet" href="#ship-design" data-i18n="exploreShip">Explore the ship</a></div>
-          <div class="hero__facts"><span><b>891</b><small data-i18n="recordsLabel">training records</small></span><span><b>23:40</b><small data-i18n="impactLabel">collision</small></span><span><b>02:20</b><small data-i18n="sinkingLabel">ship lost</small></span></div>
+          <p class="historical-time">NORTH ATLANTIC · AN INTERACTIVE EVIDENCE STORY</p>
+          <h2 data-en="Who survived—and what can the records actually tell us?" data-zh="谁在泰坦尼克号上生还？记录究竟能告诉我们什么？">Who survived—and what can the records actually tell us?</h2>
+          <p data-en="Enter a constrained evacuation simulation, see how the situation changes, and investigate the patterns and limits of the surviving dataset." data-zh="进入一场受历史条件约束的疏散模拟，观察局势如何变化，再探索现存数据中的模式与边界。">Enter a constrained evacuation simulation, see how the situation changes, and investigate the patterns and limits of the surviving dataset.</p>
+          <div class="hero__actions"><a class="action-primary" href="#experience" data-en="Enter the evacuation" data-zh="进入疏散情境">Enter the evacuation</a><a class="text-action" href="#explore" data-en="Explore the passenger data" data-zh="探索乘客数据">Explore the passenger data</a></div>
         </div>
-        <figure class="hero-photo">
-          <img src="./assets/history/titanic-southampton.jpg" alt="RMS Titanic at Southampton docks" />
-          <figcaption><span>10 APR 1912</span><span data-i18n="southamptonCaption">Southampton · the maiden voyage begins</span></figcaption>
-        </figure>
+        <figure class="hero__image"><img src="./assets/history/titanic-southampton.jpg" width="1600" height="1050" alt="RMS Titanic at Southampton docks" /><figcaption>10 APR 1912 · Southampton · Public-domain photograph</figcaption></figure>
       </section>
 
-      <section class="chronology shell" aria-label="Titanic timeline">
-        <article><time>10 APR</time><i></i><h3 data-i18n="timelineDepartTitle">Departure</h3><p data-i18n="timelineDepartCopy">Titanic leaves Southampton for Cherbourg, Queenstown, and New York.</p></article>
-        <article><time>14 APR · 23:40</time><i></i><h3 data-i18n="timelineImpactTitle">Iceberg impact</h3><p data-i18n="timelineImpactCopy">The starboard side strikes ice in the North Atlantic.</p></article>
-        <article><time>15 APR · 00:45</time><i></i><h3 data-i18n="timelineBoatTitle">First boat lowered</h3><p data-i18n="timelineBoatCopy">Evacuation unfolds unevenly across decks and stations.</p></article>
-        <article><time>15 APR · 02:20</time><i></i><h3 data-i18n="timelineSinksTitle">The ship sinks</h3><p data-i18n="timelineSinksCopy">The historical record becomes the outcome label used by the model.</p></article>
+      <section class="chronology" aria-label="Titanic chronology"><div><time>10 APR</time><strong>Departure</strong><span>Southampton → Cherbourg → Queenstown</span></div><div><time>14 APR · 23:40</time><strong>Collision</strong><span>Incomplete information spreads unevenly</span></div><div><time>15 APR · 00:45</time><strong>First boat lowered</strong><span>Evacuation conditions change over time</span></div><div><time>15 APR · 02:20</time><strong>Ship lost</strong><span>The passenger record retains only part of the night</span></div></section>
+
+      <section class="experience" id="experience">
+        <header class="section-intro"><h2 data-en="The night changes after every decision." data-zh="每一次决定都会改变接下来的夜晚。">The night changes after every decision.</h2><p data-en="Open a real passenger record, then navigate five situations shaped by time, route, companions, congestion, and incomplete information. Historical outcome, model estimate, and simulation remain separate." data-zh="打开一份真实乘客记录，再经历五个由时间、路线、同行者、拥堵与不完整信息共同塑造的局势。历史结局、模型估计与游戏模拟始终分开呈现。">Open a real passenger record, then navigate five situations shaped by time, route, companions, congestion, and incomplete information. Historical outcome, model estimate, and simulation remain separate.</p></header>
+        <div class="experience-frame"><div id="game-root" aria-live="polite"></div></div>
       </section>
 
-      <section class="ship-design shell" id="ship-design">
-        <div class="section-heading"><p class="eyebrow" data-i18n="shipEyebrow">Before the alarm</p><h2 data-i18n="shipTitle">Read the ship vertically.</h2><p data-i18n="shipCopy">The simplified game route is an interpretation: cabin → staircase → boat deck → lifeboat. It does not claim to reconstruct every historical passage or barrier.</p></div>
-        <div class="ship-design__grid">
-          <figure class="deck-plan-card"><img src="./assets/history/boat-deck-plan.svg" alt="CC0 plan of Titanic's boat deck" /><figcaption><b data-i18n="deckPlanTitle">Historical boat-deck plan</b><span data-i18n="deckPlanCopy">Lifeboat positions and launch information</span></figcaption></figure>
-          <div class="route-cutaway" aria-label="Simplified evacuation route">
-            <div class="cutaway-deck cutaway-deck--boat"><span>01</span><div><b data-i18n="boatDeck">Boat deck</b><small data-i18n="boatDeckHelp">Open deck · lifeboat stations</small></div><i>🛟</i></div>
-            <div class="cutaway-path"><b>↑</b><span data-i18n="routeThree">Final boarding decision</span></div>
-            <div class="cutaway-deck cutaway-deck--stairs"><span>02</span><div><b data-i18n="grandStaircase">Grand staircase</b><small data-i18n="stairsHelp">A recognizable vertical landmark</small></div><i>↟</i></div>
-            <div class="cutaway-path"><b>↑</b><span data-i18n="routeTwo">Move upward through the ship</span></div>
-            <div class="cutaway-deck cutaway-deck--cabin"><span>03</span><div><b data-i18n="thirdClass">Third class</b><small data-i18n="cabinHelp">The game begins below the open deck</small></div><i>🛏</i></div>
+      <section class="evidence-transition"><blockquote>One outcome is not the pattern. One pattern is not a cause.</blockquote><p>The experience now opens into the full passenger record. Analysis is available here whether or not you complete the game.</p></section>
+
+      <section class="data-story" id="evidence">
+        <header class="section-intro"><h2 data-en="Begin with sex and class—then complicate the story." data-zh="从性别与舱位开始——再让故事变得更复杂。">Begin with sex and class—then complicate the story.</h2><p>Rates include numerators, denominators, and 95% Wilson intervals. Small cohorts are marked rather than given equal visual authority.</p></header>
+        <div class="scrolly">
+          <div class="scrolly__narrative">
+            <article class="story-scene" data-scene="disparity"><h3>Sex and class intersect</h3><p>Separate “women” and “first class” bars hide the scale of variation within each class. The strongest first view is their interaction—not either variable alone.</p><div class="mobile-visual" data-mobile-visual="disparity"></div></article>
+            <article class="story-scene" data-scene="passengers"><h3>Every mark is a passenger</h3><p>Age and fare are continuous, unevenly distributed, and incomplete. Unknown age remains a separate lane instead of being replaced with the median.</p><div class="mobile-visual" data-mobile-visual="passengers"></div></article>
+            <article class="story-scene" data-scene="family"><h3>Travel groups are nonlinear</h3><p>Small family and ticket groups often show higher recorded survival than solo passengers, while some large groups fared poorly. “Family was better” is too simple.</p><div class="mobile-visual" data-mobile-visual="family"></div></article>
+            <article class="story-scene" data-scene="embarkation"><h3>An apparent port effect changes</h3><p>Cherbourg has a higher raw survival rate. Stratifying by class shows how passenger composition contributes to that relationship.</p><div class="mobile-visual" data-mobile-visual="embarkation"></div></article>
+            <article class="story-scene" data-scene="missingness"><h3>Missingness is evidence about the dataset</h3><p>Cabin is absent for most records. “Unknown deck” cannot be placed on an authoritative ship map, and missing records may reflect class and documentation.</p><div class="mobile-visual" data-mobile-visual="missingness"></div></article>
           </div>
+          <div class="scrolly__stage" id="story-visual" aria-live="polite"></div>
         </div>
       </section>
 
-      <section class="game-shell shell" id="game">
-        <div class="alarm-banner"><span class="alarm-light"></span><b>23:40</b><span data-i18n="alarmText">Collision reported. Evacuation protocol begins.</span></div>
-        <div class="game-header"><div><p class="eyebrow" data-i18n="gameEyebrow">Chapter IV · The evacuation</p><h2 data-i18n="gameTitle">The people behind the records.</h2></div><div class="game-status"><span class="status-dot"></span><span data-i18n="statusLive">LIVE SIMULATION</span></div></div>
-        <div class="mode-switch" role="tablist" aria-label="Game mode"><button class="mode-button is-active" role="tab" aria-selected="true" data-mode="captain" data-i18n="captainMode">Lifeboat commander</button><button class="mode-button" role="tab" aria-selected="false" data-mode="passenger" data-i18n="passengerMode">Play as a passenger</button></div>
-        <div class="mission-briefing" aria-label="Mission briefing"><div class="mission-briefing__objective"><span class="eyebrow" data-i18n="currentGoal">CURRENT GOAL</span><strong id="mission-objective"></strong></div><ol class="mission-steps" id="mission-steps"></ol></div>
-        <div class="game-grid">
-          <aside class="manifest panel"><div class="panel__heading"><span class="eyebrow" data-i18n="manifestEyebrow">Historical passenger manifest</span><span class="counter" id="capacity">0 / 4</span></div><h3 id="mode-title">Choose who boards first.</h3><p id="mode-copy">You have four seats. Read the clues and choose.</p><div class="passenger-list" id="passenger-list"></div><button class="button button--gold button--full" id="start-game" data-i18n="startGame">Start this watch</button><button class="button button--gold button--full action-button" id="primary-action" type="button" hidden></button><button class="button button--quiet button--full" id="reset-game" data-i18n="resetGame">Reset</button><div class="game-message" id="game-message" role="status" aria-live="polite">Read the objective, then start when you are ready.</div></aside>
-          <section class="ship-board panel" aria-label="Interactive ship deck"><div class="ship-board__top"><span class="ship-label">RMS TITANIC</span><span id="timer">READY</span><span class="score-label"><span data-i18n="score">SCORE</span> <b id="score">0</b></span></div><div class="map-prompt"><span class="status-dot"></span><strong id="map-prompt-text"></strong><small id="route-status"></small></div><div class="ship-map" id="ship-map"><div class="map-grid"></div><div class="water-level"><span></span></div><div class="zone zone--third"><b data-i18n="thirdClass">Third class</b><small>F-deck</small></div><div class="zone zone--stairs"><b data-i18n="grandStaircase">Grand staircase</b><small>midship</small></div><div class="zone zone--boat"><b data-i18n="boatDeck">Boat deck</b><small>upper deck</small></div><div class="zone zone--boiler"><b data-i18n="boilerRoom">Boiler room</b><small>lower deck</small></div><div class="route route--one"></div><div class="route route--two"></div><div class="route route--three"></div><div class="route-label" data-i18n="routeLabel">EVACUATION ROUTE</div><div class="lifeboat-drop" id="lifeboat" role="button" tabindex="0" aria-label="Green lifeboat drop target"><div class="lifeboat-drop__top"><b data-i18n="lifeboat">Lifeboat 7</b><span>CAPACITY 4</span></div><div class="seats" id="seats"><i>01</i><i>02</i><i>03</i><i>04</i></div></div><button class="route-target target--stairs" type="button" data-target="stairs"><b data-i18n="toStairs">Go to the stairs</b><small>NEXT</small></button><button class="route-target target--deck" type="button" data-target="deck"><b data-i18n="toDeck">Go to the boat deck</b><small>NEXT</small></button><button class="route-target target--boat" type="button" data-target="boat"><b data-i18n="toBoat">Board the lifeboat</b><small>FINISH</small></button><div class="player-token at-cabin" id="player-token" draggable="true">✦</div></div><div class="board-legend"><span><i class="legend-dot legend-dot--navy"></i><span data-i18n="legendShip">ship interior</span></span><span><i class="legend-dot legend-dot--gold"></i><span data-i18n="legendNext">your next move</span></span><span><i class="legend-dot legend-dot--green"></i><span data-i18n="legendSafe">lifeboat</span></span></div></section>
-        </div>
-        <section class="result-panel" id="result-panel" aria-live="polite" hidden></section>
-        <div class="leaderboard-bar" id="leaderboard"><div><span class="eyebrow" data-i18n="leaderboardEyebrow">Personal bests</span><strong data-i18n="leaderboardTitle">Your logbook</strong></div><ol id="leaderboard-list"><li data-i18n="noScores">No voyages logged yet.</li></ol></div>
+      <section class="explore" id="explore">
+        <header class="section-intro"><h2>Build a cohort. Inspect the people inside it.</h2><p>Filters update the same 891 passenger records used throughout the analytical story. Click a mark or use the keyboard-accessible passenger index.</p></header>
+        <form class="filter-ledger" id="explore-filters">
+          <label>Class<select name="pclass"><option value="">All classes</option><option value="1">First</option><option value="2">Second</option><option value="3">Third</option></select></label>
+          <label>Sex<select name="sex"><option value="">All</option><option value="female">Female</option><option value="male">Male</option></select></label>
+          <label>Embarkation<select name="embarked"><option value="">All ports</option><option value="S">Southampton</option><option value="C">Cherbourg</option><option value="Q">Queenstown</option><option value="unknown">Not recorded</option></select></label>
+          <label>Travel party<select name="family"><option value="">All</option><option value="alone">Alone</option><option value="family">With family record</option></select></label>
+          <label>Outcome<select name="outcome"><option value="">Both outcomes</option><option value="1">Survived</option><option value="0">Did not survive</option></select></label>
+          <label>Cabin record<select name="cabin"><option value="">Known and unknown</option><option value="known">Known</option><option value="unknown">Not recorded</option></select></label>
+          <label>Age record<select name="ageKnown"><option value="">Known and unknown</option><option value="known">Recorded</option><option value="unknown">Not recorded</option></select></label>
+          <label>Minimum age<input name="ageMin" type="number" min="0" max="80" inputmode="decimal" /></label>
+          <label>Maximum age<input name="ageMax" type="number" min="0" max="80" inputmode="decimal" /></label>
+          <label>Maximum fare (£)<input name="fareMax" type="number" min="0" max="520" inputmode="decimal" /></label>
+        </form>
+        <div class="explore-toolbar"><button type="button" id="filters-reset">Reset</button><button type="button" id="filters-undo" disabled>Undo</button><button type="button" id="save-cohort-a">Save as cohort A</button><button type="button" id="save-cohort-b">Save as cohort B</button></div>
+        <div class="cohort-count" id="cohort-count" aria-live="polite"></div>
+        <div class="explore-layout"><div><div id="explore-plot"></div><div class="passenger-index" id="passenger-index" aria-label="Passenger selection index"></div></div><aside class="passenger-dossier" id="passenger-dossier"></aside></div>
+        <section class="cohort-comparison"><h3>Cohort A / B comparison</h3><div id="cohort-comparison"></div></section>
       </section>
 
-      <section class="model-room shell" id="model-room">
-        <div class="model-room__intro"><p class="eyebrow" data-i18n="modelEyebrow">Chapter V · The model room</p><h2 data-i18n="modelTitle">Your decision is locked. Now reveal the evidence.</h2><p data-i18n="modelCopy">Complete an evacuation to unlock passenger-level probability, historical outcome, model factors, and dataset context.</p></div>
-        <div class="model-locked" id="model-locked"><span>⌁</span><b data-i18n="modelLockedTitle">Analysis locked</b><p data-i18n="modelLockedCopy">The outcome stays hidden until you finish the game.</p><button class="button button--gold" data-scroll-game data-i18n="goToEvacuation">Go to evacuation</button></div>
-        <div class="model-analysis" id="model-analysis" hidden></div>
-      </section>
+      <section class="model-lab" id="model"><header class="section-intro"><h2>Prediction is another lens—not an explanation of the night.</h2><p>Logistic Regression and Random Forest are evaluated with stratified cross-validation. Thresholds change which errors the model makes.</p></header><div id="model-lab-root"></div></section>
 
-      <section class="data-room shell">
-        <div class="section-heading"><p class="eyebrow" data-i18n="dataEyebrow">The evidence behind the experience</p><h2 data-i18n="dataTitle">History, model, and game are three different layers.</h2></div>
-        <div class="evidence-cards">
-          <article><span>01</span><h3 data-i18n="historyLayerTitle">Historical record</h3><p data-i18n="historyLayerCopy">Passenger fields and outcomes come from the local Kaggle Titanic CSV. Historical photographs and chronology provide context.</p></article>
-          <article><span>02</span><h3 data-i18n="modelLayerTitle">Model interpretation</h3><p data-i18n="modelLayerCopy">Logistic Regression estimates probability from class, sex, age, family, fare, embarkation, title, and deck features.</p></article>
-          <article><span>03</span><h3 data-i18n="gameLayerTitle">Playable interpretation</h3><p data-i18n="gameLayerCopy">Routes, timing, seat capacity, and scores are designed mechanics—not a complete reconstruction of the disaster.</p></article>
-        </div>
-      </section>
+      <section class="limits"><div><h2>What the records cannot prove</h2><p>The dataset does not record every corridor, crew order, language barrier, delay, family negotiation, lifeboat encounter, or individual decision. Observed disparities describe the surviving record; they do not establish simple causal rules.</p></div><ul><li>Game decisions are hypothetical.</li><li>Model estimates are associative.</li><li>Historical outcomes are fixed records.</li><li>Missing fields are not invented.</li></ul></section>
 
-      <section class="sources shell" id="sources">
-        <div><p class="eyebrow" data-i18n="sourcesEyebrow">Sources & image credits</p><h2 data-i18n="sourcesTitle">Built from traceable material.</h2></div>
-        <ul>
-          <li><a href="https://www.kaggle.com/competitions/titanic" target="_blank" rel="noreferrer">Kaggle · Titanic — Machine Learning from Disaster</a><span data-i18n="sourceKaggle">891 labeled training records used by the local project model.</span></li>
-          <li><a href="https://www.gc.noaa.gov/documents/gcil_titanic_article.pdf" target="_blank" rel="noreferrer">NOAA · R.M.S. Titanic</a><span data-i18n="sourceNoaa">Collision and sinking chronology; broader maritime context.</span></li>
-          <li><a href="https://commons.wikimedia.org/wiki/File:Titanic_in_Southampton.jpg" target="_blank" rel="noreferrer">Wikimedia Commons · Titanic in Southampton</a><span data-i18n="sourceShipPhoto">10 April 1912 photograph, public domain.</span></li>
-          <li><a href="https://commons.wikimedia.org/wiki/File:RMS_Titanic_boat_deck_plan.svg" target="_blank" rel="noreferrer">Wikimedia Commons · Boat deck plan</a><span>Maxrossomachin · CC0 1.0.</span></li>
-          <li><a href="https://commons.wikimedia.org/wiki/File:Iceberg_Titanic.png" target="_blank" rel="noreferrer">Wikimedia Commons · Iceberg Titanic</a><span data-i18n="sourceIceberg">Photographed near the wreck site in April 1912, public domain.</span></li>
-        </ul>
-      </section>
+      <section class="sources" id="sources"><header class="section-intro"><h2>Integrated data and contextual sources are not the same thing.</h2><p>Only the local Kaggle passenger table is integrated. Archival sources remain clearly labelled as contextual or candidates until a documented, licensed join exists.</p></header><div id="provenance-root"></div></section>
     </main>
 
-    <footer class="footer shell"><span>THE LAST CROSSING</span><span data-i18n="footer">A personal research game about data, history, and decisions under pressure.</span><a href="#top" data-i18n="backTop">Back to top ↑</a></footer>
-    <script src="./game.bundle.js"></script>
-    <script>
-      if (!window.__titanicGameReady) {
-        const message = document.getElementById("game-message");
-        if (message) {
-          message.textContent = "Game script did not load. 游戏脚本未加载，请确认 game.bundle.js 与 index.html 位于同一文件夹。";
-          message.classList.add("game-message--error");
-        }
-      }
-    </script>
+    <footer class="colophon"><strong>THE LAST CROSSING</strong><p>An interactive historical survival experience, exploratory passenger-data story, and ML/data-literacy project.</p><a href="#top">Return to the beginning</a></footer>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="./game.bundle.js?v=2026100504"></script>
   </body>
 </html>
