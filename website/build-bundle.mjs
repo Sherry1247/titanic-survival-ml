@@ -4,17 +4,18 @@ import { fileURLToPath } from "node:url";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const sourceFiles = [
+  "data/passenger-data.js",
   "data/model-results.js",
-  "data/passengers.js",
-  "data/levels.js",
-  "data/translations.js",
-  "engine/scoring.js",
-  "engine/level-manager.js",
+  "data/analysis.js",
+  "data/game-scenarios.js",
+  "data/provenance.js",
   "engine/game-state.js",
-  "ui/passenger-panel.js",
-  "ui/result-panel.js",
-  "ui/model-analysis.js",
-  "ui/ship-map.js",
+  "ui/format.js",
+  "ui/data-story.js",
+  "ui/explore.js",
+  "ui/game-experience.js",
+  "ui/model-lab.js",
+  "ui/provenance.js",
   "game.js",
 ];
 
