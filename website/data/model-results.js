@@ -20,6 +20,173 @@ export const MODEL_REPORT = Object.freeze({
         "f1": 0.766,
         "roc_auc": 0.8472
       }
+    },
+    "evaluation": {
+      "Logistic regression": {
+        "method": "5-fold stratified cross-validation",
+        "folds": 5,
+        "metrics": {
+          "accuracy": {
+            "mean": 0.8260184545853996,
+            "std": 0.01965451714571136
+          },
+          "f1": {
+            "mean": 0.7680742029636282,
+            "std": 0.03412564688095536
+          },
+          "roc_auc": {
+            "mean": 0.8712833140290964,
+            "std": 0.024530677836454542
+          },
+          "precision": {
+            "mean": 0.783711750554051,
+            "std": 0.014704420873451137
+          },
+          "recall": {
+            "mean": 0.7541346973572038,
+            "std": 0.054562744735665664
+          },
+          "brier": {
+            "mean": 0.1290268083122445,
+            "std": 0.00886354929769762
+          }
+        },
+        "confusion": {
+          "tn": 478,
+          "fp": 71,
+          "fn": 84,
+          "tp": 258
+        },
+        "calibration": [
+          {
+            "range": "(-0.001, 0.2]",
+            "count": 431,
+            "predicted": 0.09725502329362419,
+            "observed": 0.1136890951276102
+          },
+          {
+            "range": "(0.2, 0.4]",
+            "count": 98,
+            "predicted": 0.29521844246952594,
+            "observed": 0.24489795918367346
+          },
+          {
+            "range": "(0.4, 0.6]",
+            "count": 75,
+            "predicted": 0.5146280807708986,
+            "observed": 0.41333333333333333
+          },
+          {
+            "range": "(0.6, 0.8]",
+            "count": 132,
+            "predicted": 0.6950157321970334,
+            "observed": 0.6818181818181818
+          },
+          {
+            "range": "(0.8, 1.0]",
+            "count": 155,
+            "predicted": 0.9071796205215679,
+            "observed": 0.9548387096774194
+          }
+        ]
+      },
+      "Random forest": {
+        "method": "5-fold stratified cross-validation",
+        "folds": 5,
+        "metrics": {
+          "accuracy": {
+            "mean": 0.838359173937606,
+            "std": 0.012523509491714012
+          },
+          "f1": {
+            "mean": 0.7898155730057834,
+            "std": 0.01851217993594023
+          },
+          "roc_auc": {
+            "mean": 0.8828162517500019,
+            "std": 0.022567673558581813
+          },
+          "precision": {
+            "mean": 0.7887103897065946,
+            "std": 0.025346225715918068
+          },
+          "recall": {
+            "mean": 0.7922421142369991,
+            "std": 0.036064567787303034
+          },
+          "brier": {
+            "mean": 0.12594087566394446,
+            "std": 0.007060971570102871
+          }
+        },
+        "confusion": {
+          "tn": 476,
+          "fp": 73,
+          "fn": 71,
+          "tp": 271
+        },
+        "calibration": [
+          {
+            "range": "(-0.001, 0.2]",
+            "count": 326,
+            "predicted": 0.12454073472490018,
+            "observed": 0.10122699386503067
+          },
+          {
+            "range": "(0.2, 0.4]",
+            "count": 156,
+            "predicted": 0.2728861931486197,
+            "observed": 0.1282051282051282
+          },
+          {
+            "range": "(0.4, 0.6]",
+            "count": 104,
+            "predicted": 0.4885464305404229,
+            "observed": 0.38461538461538464
+          },
+          {
+            "range": "(0.6, 0.8]",
+            "count": 108,
+            "predicted": 0.6940756599864182,
+            "observed": 0.6018518518518519
+          },
+          {
+            "range": "(0.8, 1.0]",
+            "count": 197,
+            "predicted": 0.9223206270510241,
+            "observed": 0.934010152284264
+          }
+        ]
+      },
+      "Majority baseline": {
+        "method": "constant majority-class prediction",
+        "metrics": {
+          "accuracy": {
+            "mean": 0.6161616161616161,
+            "std": 0.0
+          },
+          "f1": {
+            "mean": 0.0,
+            "std": 0.0
+          },
+          "roc_auc": {
+            "mean": 0.5,
+            "std": 0.0
+          },
+          "precision": {
+            "mean": 0.0,
+            "std": 0.0
+          },
+          "recall": {
+            "mean": 0.0,
+            "std": 0.0
+          },
+          "brier": {
+            "mean": 0.23650647893072133,
+            "std": 0.0
+          }
+        }
+      }
     }
   },
   "dataset": {
