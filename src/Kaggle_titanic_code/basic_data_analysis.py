@@ -1,326 +1,260 @@
+"""Reproducible, descriptive exploration of the 891-row Kaggle Titanic data.
+
+These figures describe recorded associations. They do not establish causes, and
+unknown values stay unknown in explanatory views rather than being imputed.
+"""
+
+from pathlib import Path
+
+import matplotlib
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Load Titanic dataset
-df = pd.read_csv('/Users/daisiqi/Machine-Learning-for-Thermodynamic-Property-dataset-URS-/data/Kaggle_titanic_dataset/Titanic-Dataset.csv')
 
-# Data cleaning
-df['Age'] = df['Age'].fillna(df['Age'].median())
-df['Embarked'] = df['Embarked'].fillna(df['Embarked'].mode()[0])
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
-print("="*80)
-print("TITANIC DATASET: EXPLORATORY DATA ANALYSIS (EDA)")
-print("="*80)
-print("\n")
+ROOT = Path(__file__).resolve().parents[2]
+DATA_PATH = ROOT / "data" / "Kaggle_titanic_dataset" / "Titanic-Dataset.csv"
+OUTPUT_DIR = DATA_PATH.parent
 
-# ====================================================================
-# GRAPH 1: AGE DISTRIBUTION BY SURVIVAL STATUS (BOX PLOT)
-# ====================================================================
-print("GRAPH 1: Age Distribution by Survival Status (Box Plot)")
-print("-"*80)
+SURVIVED = "#2A6F97"
+NOT_SURVIVED = "#6B6259"
+BRASS = "#A4772B"
+INK = "#18212B"
 
-fig1 = plt.figure(figsize=(10, 6))
-df_plot = df.copy()
-df_plot['Survival Status'] = df_plot['Survived'].map({0: 'Did Not Survive', 1: 'Survived'})
-sns.boxplot(data=df_plot, x='Survival Status', y='Age', palette=['red', 'green'], linewidth=2)
-plt.ylabel('Age (years)', fontsize=12, fontweight='bold')
-plt.xlabel('Survival Status', fontsize=12, fontweight='bold')
-plt.title('Age Distribution by Survival Status', fontsize=13, fontweight='bold')
-plt.grid(True, alpha=0.3, axis='y')
-plt.tight_layout()
-plt.savefig('titanic_eda_graph1_age_boxplot.png', dpi=200)
-plt.show()
 
-print("✓ Graph 1 generated: titanic_eda_graph1_age_boxplot.png")
-print("\nAnalysis:")
-print("  The box plot compares age distributions between survivors and non-survivors.")
-print("  Survived group (green): Median age ~28 years, with interquartile range 5-35 years.")
-print("  This lower median reflects the 'women and children first' protocol—younger")
-print("  children and young adults (often women) received evacuation priority.")
-print("  Did Not Survive group (red): Median age ~32 years, with slightly higher median.")
-print("  The wider distribution in non-survivors includes elderly passengers (outliers),")
-print("  indicating older passengers had lower survival chances. The clear median")
-print("  separation (28 vs 32) demonstrates AGE is a MODERATE predictor of survival.")
-print("\n")
+def grouped_rates(frame: pd.DataFrame, field: str) -> pd.DataFrame:
+    result = frame.groupby(field, observed=True)["Survived"].agg(["sum", "count"])
+    result["survival_rate"] = result["sum"] / result["count"] * 100
+    result["not_survived_rate"] = 100 - result["survival_rate"]
+    return result
 
-# ====================================================================
-# GRAPH 2: SURVIVAL RATE BY GENDER (BAR PLOT)
-# ====================================================================
-print("GRAPH 2: Survival Rate by Gender (Bar Plot with Percentages)")
-print("-"*80)
 
-fig2 = plt.figure(figsize=(10, 6))
-sex_survival = df.groupby('Sex')['Survived'].agg(['sum', 'count'])
-sex_survival['survival_rate'] = (sex_survival['sum'] / sex_survival['count'] * 100)
-sex_survival['death_rate'] = 100 - sex_survival['survival_rate']
+def label_stacked_bars(ax, summary: pd.DataFrame) -> None:
+    for index, (_, row) in enumerate(summary.iterrows()):
+        ax.text(
+            index,
+            row["survival_rate"] / 2,
+            f'{int(row["sum"])}/{int(row["count"])}\n{row["survival_rate"]:.1f}%',
+            ha="center",
+            va="center",
+            color="white",
+            fontsize=9,
+            fontweight="bold",
+        )
 
-ax = sex_survival[['survival_rate', 'death_rate']].plot(kind='bar', stacked=True, 
-                                                          color=['green', 'red'], 
-                                                          edgecolor='black', linewidth=1.5,
-                                                          figsize=(10, 6), width=0.6)
-plt.ylabel('Percentage (%)', fontsize=12, fontweight='bold')
-plt.xlabel('Gender', fontsize=12, fontweight='bold')
-plt.title('Survival Rate by Gender', fontsize=13, fontweight='bold')
+
+def save_figure(filename: str) -> None:
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / filename, dpi=200, bbox_inches="tight")
+    plt.close()
+
+
+df = pd.read_csv(DATA_PATH)
+df["FamilySize"] = df["SibSp"] + df["Parch"] + 1
+
+print("=" * 80)
+print("TITANIC DATASET: DESCRIPTIVE EXPLORATION")
+print("=" * 80)
+print(f"Rows: {len(df)}")
+print(
+    "Missing values — "
+    f"Age: {df['Age'].isna().sum()}, "
+    f"Cabin: {df['Cabin'].isna().sum()}, "
+    f"Embarked: {df['Embarked'].isna().sum()}"
+)
+print("Unknown ages are excluded from age charts; no explanatory value is imputed.\n")
+
+# 1. Age distribution, complete cases only.
+age_known = df[df["Age"].notna()].copy()
+age_known["Survival Status"] = age_known["Survived"].map(
+    {0: "Did not survive", 1: "Survived"}
+)
+plt.figure(figsize=(10, 6))
+sns.boxplot(
+    data=age_known,
+    x="Survival Status",
+    y="Age",
+    hue="Survival Status",
+    palette=[NOT_SURVIVED, SURVIVED],
+    legend=False,
+)
+plt.ylabel("Recorded age (years)")
+plt.xlabel("")
+plt.title("Recorded age distribution by historical outcome")
+plt.grid(True, alpha=0.2, axis="y")
+save_figure("titanic_eda_graph1_age_boxplot.png")
+medians = age_known.groupby("Survival Status")["Age"].median()
+print("1. Age distribution (177 passengers with unknown age excluded)")
+for label, value in medians.items():
+    print(f"   {label}: median recorded age {value:.1f}")
+print("   The overlap is substantial; this figure alone does not explain why outcomes differed.\n")
+
+# 2. Sex, displayed descriptively with denominators.
+sex_survival = grouped_rates(df, "Sex")
+ax = sex_survival[["survival_rate", "not_survived_rate"]].plot(
+    kind="bar",
+    stacked=True,
+    color=[SURVIVED, NOT_SURVIVED],
+    edgecolor=INK,
+    linewidth=0.8,
+    figsize=(10, 6),
+    width=0.62,
+)
+label_stacked_bars(ax, sex_survival)
+plt.ylabel("Passengers (%)")
+plt.xlabel("Recorded sex")
+plt.title("Historical outcome by recorded sex")
 plt.xticks(rotation=0)
-plt.legend(['Survived', 'Did Not Survive'], fontsize=11, loc='upper right')
-plt.grid(True, alpha=0.3, axis='y')
+plt.legend(["Survived", "Did not survive"], frameon=False)
+plt.grid(True, alpha=0.2, axis="y")
+save_figure("titanic_eda_graph2_gender_survival.png")
+female_rate = sex_survival.loc["female", "survival_rate"] / 100
+male_rate = sex_survival.loc["male", "survival_rate"] / 100
+print("2. Historical outcome by recorded sex")
+for label, row in sex_survival.iterrows():
+    print(f"   {label}: {int(row['sum'])}/{int(row['count'])} ({row['survival_rate']:.1f}%)")
+print(f"   Descriptive risk ratio (female/male): {female_rate / male_rate:.2f}")
+print("   This is not an odds ratio and does not isolate sex from class, age, or circumstance.\n")
 
-# Add percentage labels on bars
-for i, (idx, row) in enumerate(sex_survival.iterrows()):
-    plt.text(i, row['survival_rate']/2, f"{row['survival_rate']:.1f}%", 
-             ha='center', va='center', fontweight='bold', fontsize=11, color='white')
-    plt.text(i, row['survival_rate'] + row['death_rate']/2, f"{row['death_rate']:.1f}%", 
-             ha='center', va='center', fontweight='bold', fontsize=11, color='white')
+# 3. Passenger class.
+class_survival = grouped_rates(df, "Pclass")
+ax = class_survival[["survival_rate", "not_survived_rate"]].plot(
+    kind="bar",
+    stacked=True,
+    color=[SURVIVED, NOT_SURVIVED],
+    edgecolor=INK,
+    linewidth=0.8,
+    figsize=(10, 6),
+    width=0.62,
+)
+label_stacked_bars(ax, class_survival)
+plt.ylabel("Passengers (%)")
+plt.xlabel("Passenger class")
+plt.title("Historical outcome by passenger class")
+plt.xticks([0, 1, 2], ["First", "Second", "Third"], rotation=0)
+plt.legend(["Survived", "Did not survive"], frameon=False)
+plt.grid(True, alpha=0.2, axis="y")
+save_figure("titanic_eda_graph3_pclass_survival.png")
+print("3. Historical outcome by class")
+for label, row in class_survival.iterrows():
+    print(f"   Class {label}: {int(row['sum'])}/{int(row['count'])} ({row['survival_rate']:.1f}%)")
+print("   Class is associated with many other recorded and unrecorded circumstances; the chart is not causal.\n")
 
-plt.tight_layout()
-plt.savefig('titanic_eda_graph2_gender_survival.png', dpi=200)
-plt.show()
+# 4. Ticket fare in the dataset's historical currency.
+fare_frame = df.assign(
+    **{"Survival Status": df["Survived"].map({0: "Did not survive", 1: "Survived"})}
+)
+plt.figure(figsize=(10, 6))
+sns.violinplot(
+    data=fare_frame,
+    x="Survival Status",
+    y="Fare",
+    hue="Survival Status",
+    palette=[NOT_SURVIVED, SURVIVED],
+    legend=False,
+    cut=0,
+)
+plt.ylabel("Ticket fare (£, historical pounds sterling)")
+plt.xlabel("")
+plt.title("Recorded ticket fare by historical outcome")
+plt.grid(True, alpha=0.2, axis="y")
+save_figure("titanic_eda_graph4_fare_violin.png")
+print("4. Fare distribution")
+print("   Fare is recorded in historical pounds sterling, not US dollars.")
+print("   Fare overlaps with class and ticket-party size, so it is not an independent causal explanation.\n")
 
-print("✓ Graph 2 generated: titanic_eda_graph2_gender_survival.png")
-print("\nAnalysis:")
-print("  The stacked bar chart reveals the STRONGEST predictor in the dataset:")
-print("  Female: 74.2% survival rate (233 survived out of 314)")
-print("  Male: 18.9% survival rate (109 survived out of 577)")
-print("  This 55.3 percentage-point gap shows females had ~3.9× better survival odds.")
-print("  The overwhelming green bar for females vs. red bar for males reflects the")
-print("  strict enforcement of 'women and children first' evacuation protocol.")
-print("  GENDER is unquestionably the MOST POWERFUL single predictor of survival.")
-print("\n")
-
-# ====================================================================
-# GRAPH 3: SURVIVAL RATE BY PASSENGER CLASS (BAR PLOT)
-# ====================================================================
-print("GRAPH 3: Survival Rate by Passenger Class (Bar Plot with Percentages)")
-print("-"*80)
-
-fig3 = plt.figure(figsize=(10, 6))
-pclass_survival = df.groupby('Pclass')['Survived'].agg(['sum', 'count'])
-pclass_survival['survival_rate'] = (pclass_survival['sum'] / pclass_survival['count'] * 100)
-pclass_survival['death_rate'] = 100 - pclass_survival['survival_rate']
-
-ax = pclass_survival[['survival_rate', 'death_rate']].plot(kind='bar', stacked=True, 
-                                                            color=['green', 'red'], 
-                                                            edgecolor='black', linewidth=1.5,
-                                                            figsize=(10, 6), width=0.6)
-plt.ylabel('Percentage (%)', fontsize=12, fontweight='bold')
-plt.xlabel('Passenger Class', fontsize=12, fontweight='bold')
-plt.title('Survival Rate by Passenger Class', fontsize=13, fontweight='bold')
-plt.xticks([0, 1, 2], ['1st Class', '2nd Class', '3rd Class'], rotation=0)
-plt.legend(['Survived', 'Did Not Survive'], fontsize=11, loc='upper right')
-plt.grid(True, alpha=0.3, axis='y')
-
-# Add percentage labels on bars
-for i, (idx, row) in enumerate(pclass_survival.iterrows()):
-    plt.text(i, row['survival_rate']/2, f"{row['survival_rate']:.1f}%", 
-             ha='center', va='center', fontweight='bold', fontsize=11, color='white')
-    plt.text(i, row['survival_rate'] + row['death_rate']/2, f"{row['death_rate']:.1f}%", 
-             ha='center', va='center', fontweight='bold', fontsize=11, color='white')
-
-plt.tight_layout()
-plt.savefig('titanic_eda_graph3_pclass_survival.png', dpi=200)
-plt.show()
-
-print("✓ Graph 3 generated: titanic_eda_graph3_pclass_survival.png")
-print("\nAnalysis:")
-print("  The stacked bar chart shows dramatic class-based survival disparity:")
-print("  1st Class: 63.0% survival rate (136 survived out of 216)")
-print("  2nd Class: 47.3% survival rate (87 survived out of 184)")
-print("  3rd Class: 24.2% survival rate (119 survived out of 491)")
-print("  First-class passengers had 2.6× better survival odds than third-class.")
-print("  The clear stratification reflects that 1st class had:")
-print("    • Better cabin locations (higher on ship, closer to lifeboats)")
-print("    • Earlier evacuation warnings")
-print("    • First access to lifeboat resources")
-print("  PASSENGER CLASS is the SECOND STRONGEST predictor of survival.")
-print("\n")
-
-# ====================================================================
-# GRAPH 4: FARE DISTRIBUTION BY SURVIVAL STATUS (VIOLIN PLOT)
-# ====================================================================
-print("GRAPH 4: Fare Distribution by Survival Status (Violin Plot)")
-print("-"*80)
-
-fig4 = plt.figure(figsize=(10, 6))
-df_plot = df.copy()
-df_plot['Survival Status'] = df_plot['Survived'].map({0: 'Did Not Survive', 1: 'Survived'})
-sns.violinplot(data=df_plot, x='Survival Status', y='Fare', palette=['red', 'green'], linewidth=2)
-plt.ylabel('Ticket Fare ($)', fontsize=12, fontweight='bold')
-plt.xlabel('Survival Status', fontsize=12, fontweight='bold')
-plt.title('Fare Distribution by Survival Status (Violin Plot)', fontsize=13, fontweight='bold')
-plt.grid(True, alpha=0.3, axis='y')
-plt.tight_layout()
-plt.savefig('titanic_eda_graph4_fare_violin.png', dpi=200)
-plt.show()
-
-print("✓ Graph 4 generated: titanic_eda_graph4_fare_violin.png")
-print("\nAnalysis:")
-print("  The violin plot shows fare distributions for both survival groups.")
-print("  Survived (green): Distribution peaks at higher fares ($50-100+), with a")
-print("  secondary concentration at low fares ($0-30). This reflects 1st class")
-print("  (high fares) had high survival, plus some low-fare survivors (women/children")
-print("  in 3rd class receiving evacuation priority).")
-print("  Did Not Survive (red): Distribution heavily concentrated at low fares")
-print("  ($0-30), with few high-fare passengers. Most 3rd class passengers (low fare,")
-print("  high mortality) cluster here.")
-print("  The clear separation indicates FARE is a MODERATE-STRONG predictor,")
-print("  reflecting that higher fares correlate with higher class and better survival.")
-print("\n")
-
-# ====================================================================
-# GRAPH 5: SURVIVAL RATE BY AGE GROUP (BAR PLOT)
-# ====================================================================
-print("GRAPH 5: Survival Rate by Age Group (Bar Plot)")
-print("-"*80)
-
-fig5 = plt.figure(figsize=(12, 6))
-# Create age groups
-df['AgeGroup'] = pd.cut(df['Age'], bins=[0, 5, 12, 18, 35, 60, 100], 
-                        labels=['0-5', '6-12', '13-18', '19-35', '36-60', '60+'])
-age_survival = df.groupby('AgeGroup', observed=True)['Survived'].agg(['sum', 'count'])
-age_survival['survival_rate'] = (age_survival['sum'] / age_survival['count'] * 100)
-age_survival['death_rate'] = 100 - age_survival['survival_rate']
-
-ax = age_survival[['survival_rate', 'death_rate']].plot(kind='bar', stacked=True, 
-                                                         color=['green', 'red'], 
-                                                         edgecolor='black', linewidth=1.5,
-                                                         figsize=(12, 6), width=0.7)
-plt.ylabel('Percentage (%)', fontsize=12, fontweight='bold')
-plt.xlabel('Age Group (years)', fontsize=12, fontweight='bold')
-plt.title('Survival Rate by Age Group', fontsize=13, fontweight='bold')
+# 5. Age groups, complete cases only.
+age_known["AgeGroup"] = pd.cut(
+    age_known["Age"],
+    bins=[0, 5, 12, 18, 35, 60, float("inf")],
+    labels=["0-5", "6-12", "13-18", "19-35", "36-60", "60+"],
+    include_lowest=True,
+)
+age_survival = grouped_rates(age_known, "AgeGroup")
+ax = age_survival[["survival_rate", "not_survived_rate"]].plot(
+    kind="bar",
+    stacked=True,
+    color=[SURVIVED, NOT_SURVIVED],
+    edgecolor=INK,
+    linewidth=0.8,
+    figsize=(12, 6),
+    width=0.7,
+)
+label_stacked_bars(ax, age_survival)
+plt.ylabel("Passengers with recorded age (%)")
+plt.xlabel("Recorded age group")
+plt.title("Historical outcome by age group — unknown ages excluded")
 plt.xticks(rotation=0)
-plt.legend(['Survived', 'Did Not Survive'], fontsize=11, loc='upper right')
-plt.grid(True, alpha=0.3, axis='y')
+plt.legend(["Survived", "Did not survive"], frameon=False)
+plt.grid(True, alpha=0.2, axis="y")
+save_figure("titanic_eda_graph5_agegroup_survival.png")
+print("5. Age groups (known ages only)")
+for label, row in age_survival.iterrows():
+    print(f"   {label}: {int(row['sum'])}/{int(row['count'])} ({row['survival_rate']:.1f}%)")
+print("   These are marginal group rates; small groups and overlapping variables limit interpretation.\n")
 
-# Add percentage labels on bars
-for i, (idx, row) in enumerate(age_survival.iterrows()):
-    plt.text(i, row['survival_rate']/2, f"{row['survival_rate']:.1f}%", 
-             ha='center', va='center', fontweight='bold', fontsize=10, color='white')
-    plt.text(i, row['survival_rate'] + row['death_rate']/2, f"{row['death_rate']:.1f}%", 
-             ha='center', va='center', fontweight='bold', fontsize=10, color='white')
-
-plt.tight_layout()
-plt.savefig('titanic_eda_graph5_agegroup_survival.png', dpi=200)
-plt.show()
-
-print("✓ Graph 5 generated: titanic_eda_graph5_agegroup_survival.png")
-print("\nAnalysis:")
-print("  The stacked bar chart breaks age into meaningful groups to reveal patterns:")
-print("  0-5 years (Children): 68.4% survival - VERY HIGH due to evacuation priority")
-print("  6-12 years (Children): 59.4% survival - HIGH due to evacuation priority")
-print("  13-18 years (Teenagers): 33.3% survival - MODERATE, mixed gender effects")
-print("  19-35 years (Young adults): 37.5% survival - MODERATE, gender-dependent")
-print("  36-60 years (Middle-aged): 23.8% survival - LOWER, mostly males survived")
-print("  60+ years (Elderly): 21.1% survival - LOWEST, high mortality among elderly")
-print("  Clear trend: Children had dramatic survival priority (60-68%), while elderly")
-print("  had poor survival rates (~21%). AGE GROUP is a MODERATE predictor.")
-print("\n")
-
-# ====================================================================
-# GRAPH 6: SURVIVAL RATE BY FAMILY COMPOSITION (BAR PLOT)
-# ====================================================================
-print("GRAPH 6: Survival Rate by Family Composition (Bar Plot)")
-print("-"*80)
-
-fig6 = plt.figure(figsize=(12, 6))
-df['FamilySize'] = df['SibSp'] + df['Parch'] + 1
-df['FamilyGroup'] = pd.cut(df['FamilySize'], bins=[0, 1, 2, 4, 11], 
-                           labels=['Solo', 'Pair', 'Small (3-4)', 'Large (5+)'])
-family_survival = df.groupby('FamilyGroup', observed=True)['Survived'].agg(['sum', 'count'])
-family_survival['survival_rate'] = (family_survival['sum'] / family_survival['count'] * 100)
-family_survival['death_rate'] = 100 - family_survival['survival_rate']
-
-ax = family_survival[['survival_rate', 'death_rate']].plot(kind='bar', stacked=True, 
-                                                            color=['green', 'red'], 
-                                                            edgecolor='black', linewidth=1.5,
-                                                            figsize=(12, 6), width=0.7)
-plt.ylabel('Percentage (%)', fontsize=12, fontweight='bold')
-plt.xlabel('Family Group', fontsize=12, fontweight='bold')
-plt.title('Survival Rate by Family Composition', fontsize=13, fontweight='bold')
+# 6. Family size, explicitly defined as a constructed field.
+df["FamilyGroup"] = pd.cut(
+    df["FamilySize"],
+    bins=[0, 1, 2, 4, float("inf")],
+    labels=["Alone", "Two", "Three-four", "Five+"],
+)
+family_survival = grouped_rates(df, "FamilyGroup")
+ax = family_survival[["survival_rate", "not_survived_rate"]].plot(
+    kind="bar",
+    stacked=True,
+    color=[SURVIVED, NOT_SURVIVED],
+    edgecolor=INK,
+    linewidth=0.8,
+    figsize=(12, 6),
+    width=0.7,
+)
+label_stacked_bars(ax, family_survival)
+plt.ylabel("Passengers (%)")
+plt.xlabel("Constructed family size: SibSp + Parch + 1")
+plt.title("Historical outcome by recorded family size")
 plt.xticks(rotation=0)
-plt.legend(['Survived', 'Did Not Survive'], fontsize=11, loc='upper right')
-plt.grid(True, alpha=0.3, axis='y')
+plt.legend(["Survived", "Did not survive"], frameon=False)
+plt.grid(True, alpha=0.2, axis="y")
+save_figure("titanic_eda_graph6_family_survival.png")
+print("6. Constructed family-size groups")
+for label, row in family_survival.iterrows():
+    print(f"   {label}: {int(row['sum'])}/{int(row['count'])} ({row['survival_rate']:.1f}%)")
+print("   FamilySize is derived from SibSp and Parch; it is not an independent source field.")
+print("   Family-size patterns do not by themselves establish a mechanism.\n")
 
-# Add percentage labels on bars
-for i, (idx, row) in enumerate(family_survival.iterrows()):
-    plt.text(i, row['survival_rate']/2, f"{row['survival_rate']:.1f}%", 
-             ha='center', va='center', fontweight='bold', fontsize=10, color='white')
-    plt.text(i, row['survival_rate'] + row['death_rate']/2, f"{row['death_rate']:.1f}%", 
-             ha='center', va='center', fontweight='bold', fontsize=10, color='white')
-
-plt.tight_layout()
-plt.savefig('titanic_eda_graph6_family_survival.png', dpi=200)
-plt.show()
-
-print("✓ Graph 6 generated: titanic_eda_graph6_family_survival.png")
-print("\nAnalysis:")
-print("  The stacked bar chart examines survival by family composition:")
-print("  Solo travelers: 30.3% survival - LOWEST rate, mostly unattached males")
-print("  Pairs (couples/siblings): 38.8% survival - MODERATE, mixed outcomes")
-print("  Small families (3-4): 44.8% survival - HIGHER, includes families with children")
-print("  Large families (5+): 16.7% survival - VERY LOW, difficulty evacuating entire groups")
-print("  Patterns: Small family groups (3-4) had better outcomes, likely because these")
-print("  included women and children. Very large families had poor outcomes, possibly due")
-print("  to logistical challenges in keeping groups together or exceeding family's share")
-print("  of lifeboat capacity. FAMILY COMPOSITION is a WEAK predictor of survival.")
-print("\n")
-
-# ====================================================================
-# GRAPH 7: CORRELATION HEATMAP
-# ====================================================================
-print("GRAPH 7: Correlation Heatmap (Numerical Features)")
-print("-"*80)
-
-fig7 = plt.figure(figsize=(9, 7))
-numeric_cols = ['Survived', 'Age', 'Fare', 'Pclass', 'SibSp', 'Parch', 'FamilySize']
+# 7. Correlation view without duplicating FamilySize alongside its components.
+numeric_cols = ["Survived", "Age", "Fare", "Pclass", "SibSp", "Parch"]
 corr_matrix = df[numeric_cols].corr()
+plt.figure(figsize=(9, 7))
+sns.heatmap(
+    corr_matrix,
+    annot=True,
+    fmt=".3f",
+    cmap=sns.diverging_palette(230, 35, as_cmap=True),
+    center=0,
+    square=True,
+    linewidths=1,
+    cbar_kws={"label": "Pearson correlation"},
+    vmin=-1,
+    vmax=1,
+)
+plt.title("Pairwise correlations among selected numeric fields")
+save_figure("titanic_eda_graph7_correlation_heatmap.png")
+print("7. Correlations")
+print(corr_matrix["Survived"].round(3).to_string())
+print("   Pclass is ordinal, not a continuous physical measurement.")
+print("   Pairwise correlation does not measure explained variance or causality.")
+print("   Sex and embarkation are categorical and intentionally omitted from this matrix.\n")
 
-sns.heatmap(corr_matrix, annot=True, fmt='.3f', cmap='coolwarm', center=0, 
-            square=True, linewidths=1.5, cbar_kws={'label': 'Correlation Coefficient'},
-            vmin=-1, vmax=1)
-plt.title('Correlation Heatmap: Titanic Survival Features', fontsize=13, fontweight='bold', pad=20)
-plt.tight_layout()
-plt.savefig('titanic_eda_graph7_correlation_heatmap.png', dpi=200)
-plt.show()
-
-print("✓ Graph 7 generated: titanic_eda_graph7_correlation_heatmap.png")
-print("\nAnalysis:")
-print("  The correlation matrix quantifies relationships with Survived target:")
-print("\n  STRONG PREDICTORS:")
-print("  • Pclass ↔ Survived: r = -0.338 (MODERATE)")
-print("    → Negative: Lower class number (1st) correlates with higher survival")
-print("  • Fare ↔ Survived: r = +0.257 (WEAK-MODERATE)")
-print("    → Positive: Higher fare correlates with higher survival")
-print("  • Age ↔ Survived: r = -0.070 (WEAK)")
-print("    → Negative: Younger passengers slightly more likely to survive")
-print("\n  WEAK PREDICTORS:")
-print("  • SibSp ↔ Survived: r = -0.035 (NEGLIGIBLE)")
-print("  • Parch ↔ Survived: r = +0.082 (WEAK)")
-print("  • FamilySize ↔ Survived: r = -0.016 (NEGLIGIBLE)")
-print("\n  NOTE: Gender not shown (categorical), but bar charts show it's the STRONGEST")
-print("  predictor (r ~0.74 for female=1 vs Survived). Pclass is second strongest.")
-print("\n")
-
-print("="*80)
-print("EDA SUMMARY & KEY FINDINGS")
-print("="*80)
-print("\nPredictive Feature Strength Ranking:")
-print("  1. Sex/Gender - STRONGEST (74% female vs 19% male survival) ★★★★★")
-print("  2. Pclass - VERY STRONG (63% 1st vs 24% 3rd class) ★★★★")
-print("  3. Fare - MODERATE-STRONG (correlates with class) ★★★")
-print("  4. Age - MODERATE (children 60-68%, elderly ~21%) ★★★")
-print("  5. FamilySize - WEAK (solo 30%, small 45%, large 17%) ★★")
-print("  6. SibSp/Parch - VERY WEAK (negligible individual effect) ★")
-print("\nKey Insights for Classification Model:")
-print("  • Gender is THE dominant feature (74% survival variance)")
-print("  • Class hierarchy is rigid (63% → 47% → 24%)")
-print("  • Children received evacuation priority (60-68% survival)")
-print("  • Socioeconomic factors matter (fare correlates with survival)")
-print("  • Family structure has marginal effect on outcomes")
-print("\nExpected ANN Model Performance:")
-print("  • High accuracy likely (~85%+) due to strong predictive signals")
-print("  • Gender and Pclass should dominate learned weights")
-print("  • Age will capture children/elderly effects")
-print("  • Fare will act as secondary class indicator")
-print("\n" + "="*80)
+print("=" * 80)
+print("INTERPRETATION LIMITS")
+print("=" * 80)
+print("- These charts report associations in one 891-row teaching dataset.")
+print("- They do not prove why an individual survived or did not survive.")
+print("- Cabin is missing for most rows; age is missing for 177 passengers.")
+print("- FamilySize is constructed from SibSp + Parch + 1.")
+print("- Predictive model quality must be estimated with held-out or cross-validated data,")
+print("  not inferred from descriptive charts.")
