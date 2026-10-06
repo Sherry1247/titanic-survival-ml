@@ -1,68 +1,80 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { PASSENGERS, getPassenger } from "../data/passengers.js";
+import { ALL_PASSENGERS } from "../data/analysis.js";
 import { GameState } from "../engine/game-state.js";
 
-test("commander mode fills four seats, prevents duplicates, and completes", () => {
-  const state = new GameState("captain");
-  assert.equal(state.start().ok, true);
+const withFamily = ALL_PASSENGERS.find((row) => row.pclass === 3 && !row.isAlone && row.age !== null);
+const travellingAlone = ALL_PASSENGERS.find((row) => row.pclass === 1 && row.isAlone && row.age !== null);
 
-  const chosen = ["p2", "p8", "p15", "p21"];
-  assert.equal(state.boardPassenger(getPassenger(chosen[0])).remaining, 3);
-  assert.equal(state.boardPassenger(getPassenger(chosen[0])).code, "already-aboard");
-  state.boardPassenger(getPassenger(chosen[1]));
-  state.boardPassenger(getPassenger(chosen[2]));
-  const finalMove = state.boardPassenger(getPassenger(chosen[3]));
-
-  assert.equal(finalMove.complete, true);
-  assert.equal(state.status, "won");
-  assert.deepEqual(state.boardedPassengerIds, chosen);
-  assert.equal(
-    state.score,
-    chosen.reduce((total, id) => total + getPassenger(id).priorityPoints, 0),
-  );
-  assert.deepEqual(state.result.passengerIds, state.boardedPassengerIds);
-});
-
-test("passenger mode requires a passenger and follows the route in order", () => {
-  const state = new GameState("passenger");
+test("game requires a passenger profile before starting", () => {
+  const state = new GameState();
   assert.equal(state.start().code, "choose-passenger");
-
-  state.selectPassenger("p8");
-  state.start();
-  const wrongMove = state.moveTo("deck");
-  assert.equal(wrongMove.code, "wrong-route");
-  assert.equal(state.seconds, 45);
-  assert.equal(state.node, "cabin");
-
-  assert.equal(state.moveTo("stairs").code, "reached-stairs");
-  assert.equal(state.moveTo("deck").code, "reached-deck");
-  const finalMove = state.moveTo("boat");
-
-  assert.equal(finalMove.complete, true);
-  assert.equal(state.status, "won");
-  assert.equal(state.score, 120);
-  assert.deepEqual(state.result.passengerIds, ["p8"]);
+  state.assignPassenger(withFamily);
+  assert.equal(state.start().code, "started");
+  assert.equal(state.status, "deciding");
 });
 
-test("timer ends an active watch without producing a winning score", () => {
-  const state = new GameState("captain");
-  state.start();
-  const result = state.tick(60);
-
-  assert.equal(result.code, "timeout");
-  assert.equal(state.status, "lost");
-  assert.equal(state.result.status, "lost");
+test("passenger class changes starting access and movement time", () => {
+  const third = new GameState(withFamily);
+  const first = new GameState(travellingAlone);
+  assert.ok(first.access > third.access);
+  third.start(); first.start();
+  third.choose("investigate"); first.choose("investigate");
+  assert.ok(first.minutesRemaining > third.minutesRemaining);
 });
 
-test("every passenger has localized clue text and a numeric score", () => {
-  for (const passenger of PASSENGERS) {
-    assert.ok(passenger.details.en.meta);
-    assert.ok(passenger.details.zh.meta);
-    assert.ok(passenger.details.en.clue);
-    assert.equal(typeof passenger.priorityPoints, "number");
-    assert.equal(typeof passenger.probability, "number");
-    assert.ok([0, 1].includes(passenger.historicalOutcome));
-  }
+test("decisions update understandable state rather than a score", () => {
+  const state = new GameState(withFamily);
+  state.start();
+  const before = state.minutesRemaining;
+  const result = state.choose("wake-companions");
+  assert.equal(result.code, "consequence");
+  assert.equal(state.companions, "together");
+  assert.ok(state.information > 0);
+  assert.ok(state.minutesRemaining < before);
+  assert.equal("score" in state, false);
+});
+
+test("five changing situations produce separate historical, model, and simulation outcomes", () => {
+  const state = new GameState(withFamily);
+  state.start();
+  state.choose("wake-companions"); state.continue();
+  state.choose("follow-crew"); state.continue();
+  state.choose("wait-companionway"); state.continue();
+  state.choose("nearest-queue"); state.continue();
+  const final = state.choose("present-party");
+  assert.equal(final.complete, true);
+  assert.equal(state.status, "complete");
+  assert.ok([0, 1].includes(state.result.simulationOutcome));
+  assert.ok([0, 1].includes(state.result.historicalOutcome));
+  assert.equal(typeof state.result.modelProbability, "number");
+  assert.equal(state.result.decisions.length, 5);
+  assert.equal(state.history.length, 5);
+});
+
+test("the same profile and path are reproducible for testing", () => {
+  const play = () => {
+    const state = new GameState(travellingAlone);
+    state.start();
+    state.choose("investigate"); state.continue();
+    state.choose("nearest-stairs"); state.continue();
+    state.choose("service-stair"); state.continue();
+    state.choose("cross-deck"); state.continue();
+    state.choose("seek-opening");
+    return state.result;
+  };
+  assert.deepEqual(play(), play());
+});
+
+test("route, congestion, and deck position persist across decisions", () => {
+  const state = new GameState(withFamily);
+  state.start();
+  state.choose("wait"); state.continue();
+  state.choose("follow-crew"); state.continue();
+  state.choose("wait-companionway");
+  assert.equal(state.routeStatus, "congested");
+  assert.equal(state.deckLevel, 2);
+  assert.ok(state.crowding >= 3);
+  assert.equal(state.history.at(-1).location, "upper-landing");
 });
