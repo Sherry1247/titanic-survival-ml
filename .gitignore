@@ -1,12 +1,8 @@
-# System and virtual environment files
 .DS_Store
 venv/
-survival_env/
+.venv/
 .titanic_env/
 __pycache__/
 *.py[cod]
-
-# Ignore large datasets to prevent GitHub LFS errors
-*Road Accident Data.csv
-*Covid Data.csv
-*AgeDataset-V1.csv
+.pytest_cache/
+node_modules/

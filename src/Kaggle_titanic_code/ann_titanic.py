@@ -1,3 +1,4 @@
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,7 +23,7 @@ print("\n")
 print("SECTION 1: DATA PREPARATION")
 print("-"*100)
 
-df = pd.read_csv('/Users/daisiqi/Machine-Learning-for-Thermodynamic-Property-dataset-URS-/data/Kaggle_titanic_dataset/Titanic-Dataset.csv')
+df = pd.read_csv(Path(__file__).resolve().parents[2] / 'data' / 'Kaggle_titanic_dataset' / 'Titanic-Dataset.csv')
 
 print(f"✓ Dataset loaded: {df.shape[0]} samples, {df.shape[1]} features")
 print(f"  Target: Survived (0=Did Not Survive, 1=Survived)")
