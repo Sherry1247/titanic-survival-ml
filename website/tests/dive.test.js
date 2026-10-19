@@ -15,7 +15,7 @@ const load = (f) => {
 
 test("every scene image referenced by dive.js exists", () => {
   const images = [...read("dive.js").matchAll(/img: "([^"]+\.jpg)"/g)].map((m) => m[1]);
-  assert.equal(images.length, 8);
+  assert.equal(images.length, 7);
   for (const image of images) assert.ok(existsSync(join(dive, "assets", image)), image);
 });
 

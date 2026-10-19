@@ -188,3 +188,11 @@ button { font: inherit; color: inherit; }
   .scene, #card, #veil { transition-duration: 0.01s; }
   .door-panel { transition-duration: 0.01s; }
 }
+
+/* crossing sequence: black screen + typewriter */
+#warp-text.black { background: #000; opacity: 0; transition: opacity 0.6s; }
+#warp-text.black.on { opacity: 1; }
+#warp-text .tw .second { margin-top: 0.8rem; }
+#warp-text .typing::after { content: "▍"; margin-left: 0.08em; opacity: 0.8; animation: blink 0.7s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.scene.opening .frame { transition: transform 1.2s ease-in, filter 1.2s; filter: brightness(1.6); }

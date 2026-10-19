@@ -36,7 +36,6 @@
     cabin: [B("第六章 · 舱壁", "Chapter 6 · The cabin wall"), B("一扇窗，通向曾经的住舱。", "A window into someone’s cabin.")],
     window: [B("第七章 · 黑色的窗", "Chapter 7 · The black window"), B("窗后一片漆黑。", "Beyond the glass, only darkness.")],
     stairs: [B("第八章 · 大楼梯", "Chapter 8 · The Grand Staircase"), B("木质的楼梯、雕花的栏杆——它曾经的样子。", "Oak, carved balustrades — as it once was.")],
-    dossier: [B("第九章 · 登船", "Chapter 9 · Boarding"), B("你已经成为这艘船上的一个人。", "You are now someone aboard.")],
   };
   const HINTS = {
     map: B("点击闪烁的标记 · 放大", "Click the pulsing marker · zoom in"),
@@ -46,8 +45,7 @@
     capstans: B("点击两处光点 · 然后继续下滑", "Click both glows · then keep scrolling"),
     cabin: B("点击窗口 · 然后继续下滑", "Click the window · then keep scrolling"),
     window: B("点击黑色的窗，才能继续", "Click the black window to go on"),
-    stairs: B("点击栏杆上的光点", "Click the glow on the railing"),
-    dossier: B("", ""),
+    stairs: B("", ""),
   };
 
   const CARDS = {
@@ -135,9 +133,7 @@
       hotspots: [{ id: "sections", x: 12, y: 24, tag: B("窗", "Window"), cls: "window" }], next: "fade" },
     { id: "window", img: "06-open-window.jpg", w: 1500, h: 958, fit: "cover", fx: 0.7, fy: 0.45, zoom: 0.2, depth: true, gate: true,
       hotspots: [{ id: "window", x: 78.5, y: 42, tag: B("进去", "Enter"), cls: "window" }], next: "black" },
-    { id: "stairs", ship: true, img: "07-grand-staircase.jpg", w: 736, h: 404, fit: "cover", fx: 0.3, fy: 0.4, zoom: 0.1, gate: true,
-      hotspots: [{ id: "railing", x: 24, y: 31, tag: B("栏杆", "Balustrade") }], next: "warp" },
-    { id: "dossier", ship: true, keepCover: true, img: "08-cherub.jpg", w: 1024, h: 684, fit: "cover", fx: 0.5, fy: 0.5, zoom: 0.05, end: true },
+    { id: "stairs", ship: true, end: true, img: "07-grand-staircase.jpg", w: 736, h: 404, fit: "cover", fx: 0.3, fy: 0.4, zoom: 0.08 },
   ];
   const indexOf = (id) => SCENES.findIndex((s) => s.id === id);
 
@@ -482,7 +478,7 @@
     el.gauge.classList.toggle("on", to >= indexOf("diver") && !def.ship);
     if (def.id !== "diver") { el.surface.style.opacity = "0"; }
     snow.targetSpeed = def.id === "diver" ? 1.2 : 0.35;
-    el.caption.classList.toggle("hide", def.id === "dossier" || def.kind === "map");
+    el.caption.classList.toggle("hide", def.id === "stairs" || def.kind === "map");
     el.hint.classList.toggle("hide", !HINTS[def.id] || !tx(HINTS[def.id]));
     refreshCaption();
     gaugeSet(def, 0);
@@ -512,7 +508,7 @@
       el.door.classList.add("fade"); await wait(1300);
       el.door.className = "";
     }
-    el.caption.classList.toggle("hide", SCENES[idx].id === "dossier");
+    el.caption.classList.toggle("hide", SCENES[idx].id === "stairs");
     busy = false;
   }
   function next() {
@@ -559,7 +555,7 @@
     else if (["ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); step(SCENES[idx].kind === "map" ? -1 : -0.3); }
   });
   el.cont.addEventListener("click", () => step(SCENES[idx].kind === "map" ? 1 : 0.34));
-  $("#lang").addEventListener("click", () => { lang = lang === "zh" ? "en" : "zh"; store.set("dive-lang", lang); applyLang(); if (passenger && SCENES[idx].id === "dossier") showDossier(true); });
+  $("#lang").addEventListener("click", () => { lang = lang === "zh" ? "en" : "zh"; store.set("dive-lang", lang); applyLang(); if (passenger && SCENES[idx].id === "stairs") showDossier(true); });
   $("#restart").addEventListener("click", () => location.reload());
 
   /* ------------------------------------------------------------------- cards */
@@ -584,7 +580,7 @@
     el.card.classList.remove("show");
     const cb = cardOnClose; cardOnClose = null;
     setTimeout(() => { if (!cardOpen) el.card.hidden = true; }, 500);
-    if (!silent) { el.hint.classList.toggle("hide", !tx(HINTS[SCENES[idx].id] || "")); el.caption.classList.toggle("hide", SCENES[idx].id === "dossier"); if (cb) cb(); }
+    if (!silent) { el.hint.classList.toggle("hide", !tx(HINTS[SCENES[idx].id] || "")); el.caption.classList.toggle("hide", SCENES[idx].id === "stairs"); if (cb) cb(); }
   }
   el.cardClose.addEventListener("click", () => closeCard());
 
@@ -658,12 +654,50 @@
     if (CARDS[id]) openCard(cardHtml(CARDS[id]), { onClose: () => markFound(id, b) });
     else if (id === "sections") openSections(b);
     else if (id === "window") enterWindow(b);
-    else if (id === "railing") crossOver(b);
   });
 
   async function enterWindow(btn) {
-    markFound("window", btn); gateOpen.window = true;
-    await go(indexOf("stairs"), "black");
+    // clicking "Enter" crosses over immediately: full black, then typewriter text, then the staircase
+    markFound("window", btn); gateOpen.window = true; busy = true; passenger = pickPassenger();
+    closeCard(true);
+    el.caption.classList.add("hide"); el.hint.classList.add("hide");
+    btn.classList.add("found");
+    SCENES[idx].el.classList.add("opening");
+    await wait(900);
+    el.veil.style.transitionDuration = "1.2s"; el.veil.classList.add("on"); await wait(1300);
+    activate(indexOf("stairs")); SCENES[idx].el.classList.add("hold");
+    el.caption.classList.add("hide"); el.hint.classList.add("hide");
+    SCENES[indexOf("window")].el.classList.remove("opening");
+    await wait(300);
+    const q = passenger;
+    const lines = [
+      tx(B("你穿越了。", "You crossed over.")),
+      tx(B(`你是 ${q.name}。`, `You are ${q.name}.`)),
+    ];
+    const date = tx(B("1912 年 4 月 10 日 · 南安普顿", "10 April 1912 · Southampton"));
+    el.warp.innerHTML = '<div class="tw"><span class="big"></span><span class="big second"></span><span class="sub"></span></div>';
+    el.warp.classList.add("on", "black");
+    const [a, b2, sub] = $$all(".tw span", el.warp);
+    await typeInto(a, lines[0], 90); await wait(500);
+    await typeInto(b2, lines[1], 90); await wait(500);
+    await typeInto(sub, date, 35); await wait(1500);
+    el.warp.classList.remove("on");
+    await wait(700);
+    el.veil.classList.remove("on"); await wait(1300); el.veil.style.transitionDuration = "";
+    el.warp.classList.remove("black"); el.warp.innerHTML = "";
+    SCENES[idx].el.classList.remove("hold");
+    busy = false;
+    showDossier();
+  }
+  function typeInto(node, text, ms) {
+    return new Promise((res) => {
+      if (REDUCED) { node.textContent = text; return res(); }
+      let i = 0; node.classList.add("typing");
+      const t = setInterval(() => {
+        node.textContent = text.slice(0, ++i);
+        if (i >= text.length) { clearInterval(t); node.classList.remove("typing"); res(); }
+      }, ms);
+    });
   }
 
   function pickPassenger() {
@@ -671,24 +705,6 @@
     const buf = new Uint32Array(1); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(buf) : (buf[0] = Math.floor(Math.random() * 4294967295));
     const r = rows[buf[0] % rows.length];
     return { id: r[0], name: r[1], pclass: r[2], sex: r[3], age: r[4], sibSp: r[5], parch: r[6], ticket: r[7], fare: r[8], embarked: r[9], cabin: r[10] };
-  }
-
-  async function crossOver(btn) {
-    markFound("railing", btn); gateOpen.stairs = true; passenger = pickPassenger(); busy = true;
-    const st = SCENES[idx];
-    el.caption.classList.add("hide"); el.hint.classList.add("hide");
-    st.el.classList.add("warp");
-    await wait(600);
-    el.warp.innerHTML = `<div><span class="big">${esc(tx(B("你穿越了。", "You crossed over.")))}</span><span class="sub">${esc(tx(B("1912 年 4 月 10 日 · 南安普顿", "10 April 1912 · Southampton")))}</span></div>`;
-    el.warp.classList.add("on");
-    await wait(1700);
-    el.veil.classList.add("white", "on"); await wait(1000);
-    el.warp.classList.remove("on");
-    activate(indexOf("dossier")); st.el.classList.remove("warp");
-    await wait(500);
-    el.veil.classList.remove("on"); await wait(1100); el.veil.classList.remove("white");
-    busy = false;
-    showDossier();
   }
 
   function showDossier(instant) {
