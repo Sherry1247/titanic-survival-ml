@@ -2,6 +2,8 @@
 
 An applied-ML project built on the Kaggle Titanic dataset: exploratory analysis, an ANN / logistic-regression survival model, a Streamlit game, and a standalone static website ("The Last Crossing").
 
+**🌊 Live demo: https://titanic-time-travel.vercel.app**
+
 Originally developed inside [URS-Applied-ML-Research](https://github.com/Sherry1247/URS-Applied-ML-Research) and split out here with its commit history preserved.
 
 ## Layout
@@ -25,7 +27,7 @@ pytest                                            # Python tests
 npm test --prefix website                         # website engine tests
 ```
 
-Immersive dive: open `website/index.html`. Previous static site: open `website/classic.html`, or `cd website && python3 -m http.server 4173`.
+Immersive dive: open the [live demo](https://titanic-time-travel.vercel.app), or open `website/index.html` locally. Previous static site: open `website/classic.html`, or `cd website && python3 -m http.server 4173`.
 
 ## Data
 
