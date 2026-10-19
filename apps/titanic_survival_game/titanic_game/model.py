@@ -1,5 +1,7 @@
 """Training and inference utilities for the Titanic game."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 import pandas as pd

@@ -2,6 +2,17 @@
 
 This folder is a static, framework-free version of the Titanic Survival Game. It is independent from Streamlit and can be deployed directly to Vercel, Netlify, GitHub Pages, or any static host.
 
+## Immersive dive (chapters 1–9) — `dive/index.html`
+
+A scroll-and-click experience that replaces the old text-first opening: world map → zoom to the wreck site → *Deep Inside the Titanic* → you are the diver → bow → forward deck → cabin wall (door transition) → black window → Grand Staircase → you cross over and are assigned a random passenger record.
+
+- Open `website/dive/index.html` directly (works from `file://`; no CDN, fonts or network needed) or serve `website/`.
+- Controls: mouse wheel / trackpad / swipe / `↓` `PgDn` `Space` to advance, click glowing hotspots, `Esc` closes a card. `EN/中` switches language; `↺` restarts.
+- Chapters 7 and 8 are gated: you must click the black window / the balustrade to continue.
+- `dive/data/world-land.js` and `dive/data/passengers.js` are generated: `npm install --prefix website && npm run build:dive-data --prefix website`. Passenger rows deliberately **exclude the historical outcome** (sealed for the next chapter).
+- Images live in `dive/assets/` (supplied by the project owner; **confirm you have the right to publish them** — the diver image carries a third-party watermark and the poster is a documentary frame).
+- Browser walkthrough (optional): `python website/tests/e2e/dive_walkthrough.py` (needs `pip install playwright`).
+
 ## Local preview
 
 You can open `index.html` directly by double-clicking it. The checked-in

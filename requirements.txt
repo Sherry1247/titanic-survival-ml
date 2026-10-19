@@ -1,2 +1,2 @@
 -r apps/titanic_survival_game/requirements.txt
-pytest>=8.0
+pytest>=8.0,<10

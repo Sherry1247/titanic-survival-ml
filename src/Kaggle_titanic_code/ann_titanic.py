@@ -23,38 +23,50 @@ print("\n")
 print("SECTION 1: DATA PREPARATION")
 print("-"*100)
 
-df = pd.read_csv(Path(__file__).resolve().parents[2] / 'data' / 'Kaggle_titanic_dataset' / 'Titanic-Dataset.csv')
+DATA_PATH = Path(__file__).resolve().parents[2] / 'data' / 'Kaggle_titanic_dataset' / 'Titanic-Dataset.csv'
+OUTPUT_DIR = DATA_PATH.parent
+df = pd.read_csv(DATA_PATH)
 
 print(f"✓ Dataset loaded: {df.shape[0]} samples, {df.shape[1]} features")
 print(f"  Target: Survived (0=Did Not Survive, 1=Survived)")
 print(f"  Class distribution: {(df['Survived']==0).sum()} died, {(df['Survived']==1).sum()} survived\n")
 
-# Data cleaning
-print("✓ Data Cleaning:")
-print(f"  - Missing Age: {df['Age'].isnull().sum()} (19.9%) → Filled with median = {df['Age'].median():.1f}")
-df['Age'] = df['Age'].fillna(df['Age'].median())
-print(f"  - Missing Fare: {df['Fare'].isnull().sum()} → Filled with median = {df['Fare'].median():.2f}")
-df['Fare'] = df['Fare'].fillna(df['Fare'].median())
-print(f"  - Missing Embarked: {df['Embarked'].isnull().sum()} → Filled with mode = {df['Embarked'].mode()[0]}")
-df['Embarked'] = df['Embarked'].fillna(df['Embarked'].mode()[0])
+# Data cleaning: split FIRST, then impute with statistics learned from the
+# training rows only, so no test-set information leaks into preprocessing.
+print("✓ Data Cleaning (split-then-impute):")
 df_clean = df.drop(['PassengerId', 'Name', 'Ticket', 'Cabin'], axis=1)
 df_clean['FamilySize'] = df_clean['SibSp'] + df_clean['Parch'] + 1
 print(f"  - Dropped: PassengerId, Name, Ticket, Cabin (low predictive value)")
-print(f"  - Created FamilySize = SibSp + Parch + 1\n")
+print(f"  - Created FamilySize = SibSp + Parch + 1")
 
-# Feature encoding
-X = pd.get_dummies(df_clean.drop('Survived', axis=1), columns=['Sex', 'Embarked'], drop_first=False)
+train_df, test_df = train_test_split(
+    df_clean, test_size=0.2, random_state=42, stratify=df_clean['Survived']
+)
+train_df, test_df = train_df.copy(), test_df.copy()
+for column, how in (('Age', 'median'), ('Fare', 'median'), ('Embarked', 'mode')):
+    fill = train_df[column].median() if how == 'median' else train_df[column].mode()[0]
+    print(f"  - {column}: {train_df[column].isnull().sum()} missing in train → filled with train {how} = {fill}")
+    train_df[column] = train_df[column].fillna(fill)
+    test_df[column] = test_df[column].fillna(fill)
+print()
+
+# Feature encoding (same columns for both splits)
+categorical = ['Sex', 'Embarked']
+X_train_df = pd.get_dummies(train_df.drop('Survived', axis=1), columns=categorical)
+X_test_df = pd.get_dummies(test_df.drop('Survived', axis=1), columns=categorical)
+X_test_df = X_test_df.reindex(columns=X_train_df.columns, fill_value=0)
+X = X_train_df  # column reference for reporting
+y_train = train_df['Survived'].values
+y_test = test_df['Survived'].values
 y = df_clean['Survived'].values
 
 print(f"✓ Feature Engineering:")
 print(f"  - Total features after one-hot encoding: {X.shape[1]}")
 print(f"  - Features: {list(X.columns)}\n")
 
-# Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X.values, y, test_size=0.2, random_state=42, stratify=y)
 scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+X_train_scaled = scaler.fit_transform(X_train_df.values.astype(float))
+X_test_scaled = scaler.transform(X_test_df.values.astype(float))
 
 print(f"✓ Train-Test Split & Scaling:")
 print(f"  - Training samples: {X_train_scaled.shape[0]}")
@@ -131,10 +143,10 @@ class ANNTracker:
         return self.model
 
 print(f"ANN Architecture:")
-print(f"  • Input Layer: 11 neurons")
+print(f"  • Input Layer: {X.shape[1]} neurons")
 print(f"  • Hidden Layer 1: 32 neurons (ReLU activation)")
 print(f"  • Hidden Layer 2: 16 neurons (ReLU activation)")
-print(f"  • Output Layer: 2 neurons (Softmax)")
+print(f"  • Output Layer: 1 neuron (logistic / sigmoid, binary)")
 print(f"  • Optimizer: Adam (learning rate = 0.001)")
 print(f"  • Regularization: L2 (alpha = 0.01)")
 print(f"  • Strategy: Early stopping with patience = 30\n")
@@ -230,7 +242,7 @@ ax2.legend(fontsize=11, loc='upper right')
 ax2.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('titanic_viz1_loss_mae.png', dpi=200, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / 'titanic_viz1_loss_mae.png', dpi=200, bbox_inches='tight')
 plt.show()
 
 print("✓ Graph 1 saved: titanic_viz1_loss_mae.png\n")
@@ -275,7 +287,7 @@ ax.text(0.98, 0.05, status_text, transform=ax.transAxes, fontsize=10,
         verticalalignment='bottom', horizontalalignment='right', bbox=props, fontweight='bold')
 
 plt.tight_layout()
-plt.savefig('titanic_viz2_overfitting_fixed.png', dpi=200, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / 'titanic_viz2_overfitting_fixed.png', dpi=200, bbox_inches='tight')
 plt.show()
 
 print("✓ Graph 2 saved: titanic_viz2_overfitting_fixed.png\n")
@@ -305,7 +317,7 @@ ax.fill_between(fpr_ann, 0, tpr_ann, alpha=0.2, color='blue')
 ax.fill_between(fpr_lr, 0, tpr_lr, alpha=0.2, color='green')
 
 plt.tight_layout()
-plt.savefig('titanic_viz4_roc.png', dpi=200, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / 'titanic_viz4_roc.png', dpi=200, bbox_inches='tight')
 plt.show()
 
 print("✓ Graph 4 saved: titanic_viz4_roc.png\n")

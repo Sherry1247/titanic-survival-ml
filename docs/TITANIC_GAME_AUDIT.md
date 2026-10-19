@@ -1,3 +1,5 @@
+> **归档说明（2026-10-18）**：本文是 2026-09-29 对早期 Streamlit 原型（“救生艇指挥官 / 扮演乘客”）的审计快照，其中描述的玩法已被 `website/dive/` 的沉浸式下潜版本取代。现行设计见 `website/README.md` 与 `docs/CURRENT_WEBSITE_ISSUES.md`。
+
 # Titanic Survival Game：沙盒测试与成熟度审计
 
 测试日期：2026-09-29

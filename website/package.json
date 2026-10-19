@@ -6,6 +6,11 @@
     "build": "node build-bundle.mjs",
     "model:export": "python scripts/export_model_report.py",
     "check:bundle": "node build-bundle.mjs --check",
-    "test": "npm run check:bundle && node --test"
+    "test": "npm run check:bundle && node --test",
+    "build:dive-data": "node scripts/build-dive-data.mjs"
+  },
+  "devDependencies": {
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
   }
 }

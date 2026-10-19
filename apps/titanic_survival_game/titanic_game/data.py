@@ -1,5 +1,8 @@
 """Data loading and leakage-safe feature preparation for Titanic."""
 
+from __future__ import annotations
+
+import os
 from pathlib import Path
 import re
 
@@ -12,7 +15,21 @@ REQUIRED_COLUMNS = {
 
 
 def default_data_path() -> Path:
-    return Path(__file__).resolve().parents[3] / "data" / "Kaggle_titanic_dataset" / "Titanic-Dataset.csv"
+    """Locate the dataset.
+
+    Order: ``TITANIC_DATA_PATH`` environment variable, then the first ancestor
+    directory that contains ``data/Kaggle_titanic_dataset/Titanic-Dataset.csv``.
+    """
+    override = os.environ.get("TITANIC_DATA_PATH")
+    if override:
+        return Path(override)
+    relative = Path("data") / "Kaggle_titanic_dataset" / "Titanic-Dataset.csv"
+    for parent in Path(__file__).resolve().parents:
+        if (parent / relative).is_file():
+            return parent / relative
+    raise FileNotFoundError(
+        f"Could not find {relative} above {__file__}; set TITANIC_DATA_PATH to the CSV location."
+    )
 
 
 def _extract_title(name: str) -> str:

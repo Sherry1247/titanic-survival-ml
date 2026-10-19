@@ -61,3 +61,14 @@ Responsive rules, touch targets, text reflow, and reduced motion are implemented
 - Do not label decisions immediately as good or bad.
 - Do not present model associations as causal explanations.
 - Keep the data story accessible without completing the game.
+
+## Immersive dive (added 2026-10-18)
+
+Chapters 1–9 (`website/dive/`) are playable end to end. Known limits:
+
+- **Image rights and quality.** The eight photographs were supplied by the project owner; the diver picture is 335×597 with a visible third-party watermark, the poster is 365×547 and the Grand Staircase is a 736×404 render. They are upscaled over a blurred copy of themselves. Replace with licensed or higher-resolution images before a public release.
+- **Hotspot coordinates are hand-placed** as percentages of each image; re-check them if an image is swapped.
+- **Figures** on the cards (2,229 aboard; 325/285/706 passengers; ~913 crew; ~58 cooks and kitchen staff; 8 musicians; 16 compartments; 3,840 m) come from public compilations and differ slightly between sources; the UI says so.
+- **Cabin cross-section is schematic**, not a general-arrangement plan (stated on the card).
+- **Next chapter not built:** the assigned passenger's night (route choices, outcome reveal) still lives in the classic game (`../index.html`).
+- **Physical-device QA** (iOS/Android, large text) is still outstanding; layout was checked at 390×844 and 1280×800 in headless Chromium.

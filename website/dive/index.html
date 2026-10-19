@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>The Last Crossing · 深海下潜</title>
+    <meta name="description" content="An immersive dive to the Titanic wreck: zoom in on the map, descend with the diver, explore the wreck, then step into a passenger's life." />
+    <meta name="theme-color" content="#04121c" />
+    <link rel="stylesheet" href="../tokens.css" />
+    <link rel="stylesheet" href="./dive.css" />
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="snow" aria-hidden="true"></canvas>
+      <div id="scenes"></div>
+      <div id="surface" aria-hidden="true"></div>
+
+      <header id="hud">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">⚓</span> <span data-i18n="brand">THE LAST CROSSING</span></div>
+        <div class="hud-right">
+          <span id="found" class="found" title="" aria-live="polite"></span>
+          <button id="lang" class="chip" type="button" aria-label="Language / 语言">EN</button>
+          <button id="restart" class="chip" type="button" data-i18n-aria="restartAria">↺</button>
+        </div>
+      </header>
+
+      <aside id="gauge" aria-hidden="true">
+        <div class="gauge-track"><div class="gauge-fill"></div><div class="gauge-dot"></div></div>
+        <div class="gauge-read"><b id="depth">0</b><small>m</small></div>
+        <div class="gauge-wreck" data-i18n="gaugeWreck">沉船 3,840 m</div>
+      </aside>
+
+      <section id="caption" aria-live="polite">
+        <p class="eyebrow" id="cap-eyebrow"></p>
+        <p class="line" id="cap-line"></p>
+      </section>
+
+      <div id="hint" aria-hidden="true"><span id="hint-text"></span><span class="chev">⌄</span></div>
+      <button id="continue" class="continue" type="button" data-i18n-aria="continue"><span class="chev">⌄</span></button>
+
+      <div id="card" role="dialog" aria-labelledby="card-title" hidden>
+        <button id="card-close" class="card-close" type="button" data-i18n-aria="close">×</button>
+        <div id="card-body"></div>
+      </div>
+
+      <div id="warp-text" aria-hidden="true"></div>
+      <div id="veil" aria-hidden="true"></div>
+      <div id="door" aria-hidden="true"><div class="door-glow"></div><div class="door-panel l"></div><div class="door-panel r"></div></div>
+    </main>
+    <noscript><p style="padding:2rem;color:#efe6d2">This experience needs JavaScript. 此体验需要启用 JavaScript。</p></noscript>
+    <script src="./data/world-land.js"></script>
+    <script src="./data/passengers.js"></script>
+    <script src="./dive.js"></script>
+  </body>
+</html>

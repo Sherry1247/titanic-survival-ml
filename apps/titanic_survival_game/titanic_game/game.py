@@ -1,5 +1,7 @@
 """Game mechanics: score real historical-label guesses without causal claims."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 import random
 

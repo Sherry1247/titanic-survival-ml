@@ -1,0 +1,20 @@
+[project]
+name = "titanic-survival-ml"
+version = "0.2.0"
+description = "Titanic survival ML analysis and an immersive wreck-dive game"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pandas>=2.0,<4",
+  "scikit-learn>=1.2,<2",
+  "streamlit>=1.35,<2",
+  "plotly>=5.20,<7",
+  "matplotlib>=3.8,<4",
+  "seaborn>=0.13,<1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0,<10", "flake8>=7"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
