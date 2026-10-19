@@ -2,6 +2,8 @@
  * Classic script (no modules) so it runs from file://. No network access needed. */
 (() => {
   "use strict";
+  // Directory of this script, so the page works from website/index.html and website/dive/index.html alike.
+  const BASE = ((document.currentScript && document.currentScript.src) || location.href).replace(/[^/]*$/, "");
 
   const $ = (s, r = document) => r.querySelector(s);
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -168,7 +170,7 @@
         <button id="marker" type="button"><span class="core"></span><span class="tag"></span></button>
         <div class="map-readout"><div class="stage"></div><div class="coords"></div></div>`;
     } else {
-      const url = `./assets/${def.img}`;
+      const url = `${BASE}assets/${def.img}`;
       s.innerHTML = `<div class="bg" style="background-image:url('${url}')"></div>
         <div class="frame"><img src="${url}" alt="" draggable="false" />${(def.hotspots || []).map((h) =>
           `<button class="hotspot ${h.cls || ""}" type="button" data-hs="${h.id}" style="left:${h.x}%;top:${h.y}%"><span class="core"></span><span class="tag"></span></button>`).join("")}</div>
@@ -705,7 +707,7 @@
       <p class="note">${esc(tx(B("这是 Kaggle 泰坦尼克号数据集中的一条真实记录，由系统随机分配给你。缺失的信息保持“未记录”，不做编造。下一章将揭开他/她那一夜的经历。", "This is a real row from the Kaggle Titanic dataset, assigned to you at random. Missing fields stay “not recorded” — nothing is invented. The next chapter follows this person through the night.")))}</p>
       <div class="actions"><button class="btn" type="button" disabled style="opacity:.55;cursor:not-allowed">${esc(tx(B("下一章：4 月 14 日之夜（开发中）", "Next: the night of 14 April (in development)")))}</button>
       <button class="btn ghost" type="button" id="again">${esc(tx(B("重新潜水", "Dive again")))}</button>
-      <a class="btn ghost" href="../index.html">${esc(tx(B("经典版游戏", "Classic edition")))}</a></div></div>`, { wide: true, noClose: true });
+      <a class="btn ghost" href="${BASE}../classic.html">${esc(tx(B("经典版游戏", "Classic edition")))}</a></div></div>`, { wide: true, noClose: true });
     $("#again", el.card).addEventListener("click", () => location.reload());
   }
 

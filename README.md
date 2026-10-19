@@ -9,7 +9,7 @@ Originally developed inside [URS-Applied-ML-Research](https://github.com/Sherry1
 | Path | Contents |
 |---|---|
 | `apps/titanic_survival_game/` | Streamlit app + model (Logistic Regression pipeline) |
-| `website/dive/` | **Immersive dive experience** (map → wreck → your passenger) — open `website/dive/index.html` |
+| `website/index.html` + `website/dive/` | **Immersive dive experience** (map → wreck → your passenger) |
 | `website/` | Framework-free static game and data story (see `website/README.md`) |
 | `src/Kaggle_titanic_code/` | EDA and ANN training scripts |
 | `data/Kaggle_titanic_dataset/` | Dataset and generated figures |
@@ -25,7 +25,7 @@ pytest                                            # Python tests
 npm test --prefix website                         # website engine tests
 ```
 
-Immersive dive: open `website/dive/index.html`. Classic static website: open `website/index.html`, or `cd website && python3 -m http.server 4173`.
+Immersive dive: open `website/index.html`. Previous static site: open `website/classic.html`, or `cd website && python3 -m http.server 4173`.
 
 ## Data
 

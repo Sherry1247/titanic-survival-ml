@@ -25,6 +25,9 @@ test("the dive works offline: no network URLs, modules, or CDN scripts", () => {
   }
   assert.doesNotMatch(read("dive.js"), /^\s*(import|export)\s/m);
   assert.doesNotMatch(read("index.html"), /type="module"/);
+  const entry = readFileSync(join(dive, "..", "index.html"), "utf8");
+  assert.match(entry, /\.\/dive\/dive\.js/);
+  assert.doesNotMatch(entry, /https?:\/\/(?!www\.w3\.org)/);
 });
 
 test("passenger records keep the historical outcome sealed", () => {

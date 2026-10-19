@@ -3,7 +3,7 @@ Usage: python dive_walkthrough.py [width height tag locale]. Screenshots go to t
 import asyncio, sys
 from playwright.async_api import async_playwright
 from pathlib import Path
-URL=(Path(__file__).resolve().parents[2]/"dive"/"index.html").as_uri()
+URL=(Path(__file__).resolve().parents[2]/"index.html").as_uri()
 OUT=Path(__file__).resolve().parent/"shots"; OUT.mkdir(exist_ok=True)
 async def main(w=1280,h=800,tag="d"):
     async with async_playwright() as pw:

@@ -6,8 +6,8 @@ import { fileURLToPath } from "node:url";
 
 const website = dirname(dirname(fileURLToPath(import.meta.url)));
 
-test("index uses the classic bundle so it can be opened from file URLs", () => {
-  const html = readFileSync(join(website, "index.html"), "utf8");
+test("classic page uses the classic bundle so it can be opened from file URLs", () => {
+  const html = readFileSync(join(website, "classic.html"), "utf8");
   assert.match(html, /<script src="\.\/game\.bundle\.js(?:\?v=\d+)?"><\/script>/);
   assert.doesNotMatch(html, /<script type="module"/);
 });
