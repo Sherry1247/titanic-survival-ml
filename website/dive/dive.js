@@ -126,7 +126,7 @@
   const SCENES = [
     { id: "map", kind: "map", next: "fade" },
     { id: "poster", img: "05-poster.jpg", w: 365, h: 547, fit: "contain", maxH: 0.82, zoom: 0.07, next: "fade" },
-    { id: "diver", img: "01-diver.jpg", w: 335, h: 597, fit: "contain", maxH: 1, zoom: 0.3, drift: 0.12, depth: true, next: "sink" },
+    { id: "diver", img: "01-diver.jpg", w: 335, h: 597, fit: "scroll", tall: 2.3, zoom: 0, depth: true, next: "sink" },
     { id: "bow", img: "02-bow.jpg", w: 1400, h: 788, fit: "cover", fx: 0.72, fy: 0.55, zoom: 0.2, depth: true,
       hotspots: [{ id: "bow", x: 77, y: 63, tag: B("船艏的边缘", "Edge of the bow") }], next: "fade" },
     { id: "capstans", img: "03-capstans.jpg", w: 1400, h: 805, fit: "cover", fx: 0.455, fy: 0.62, zoom: 0.16, depth: true,
@@ -187,7 +187,13 @@
     if (!def.frame) return;
     const r = def.w / def.h;
     let w, h;
-    if (def.fit === "contain") {
+    if (def.fit === "scroll") {
+      // tall strip: the picture itself scrolls past the viewport as the diver descends
+      h = vh * def.tall; w = h * r;
+      def.frame.style.left = `${(vw - w) / 2}px`;
+      def.frame.style.top = "0px";
+      def.scrollH = h - vh;
+    } else if (def.fit === "contain") {
       h = Math.min(vh * def.maxH, vw / r);
       w = h * r;
       def.frame.style.left = `${(vw - w) / 2}px`;
@@ -447,8 +453,8 @@
   function setProgress(def, v) {
     if (!def.frame) return;
     const s = 1 + def.zoom * v;
-    const ty = -(def.drift || 0.03) * v * vh;
-    def.frame.style.transform = `translate3d(0, ${ty}px, 0) scale(${s})`;
+    const ty = def.fit === "scroll" ? -v * (def.scrollH || 0) : -(def.drift || 0.03) * v * vh;
+    def.frame.style.transform = def.fit === "scroll" ? `translate3d(0, ${ty}px, 0)` : `translate3d(0, ${ty}px, 0) scale(${s})`;
     if (def.id === "diver") {
       def.tint.style.opacity = String(v * 0.6);
       el.surface.style.opacity = String(clamp(1 - v * 3.2, 0, 1) * 0.9);
